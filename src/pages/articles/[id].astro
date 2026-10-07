@@ -21,7 +21,7 @@ const types={design:'설계 기록',decision:'선택 기록',incident:'장애 �
   <nav class="breadcrumbs" aria-label="현재 위치"><a href="/articles/">기록</a><span aria-hidden="true">/</span><a href={`/articles/category/${data.category}/`}>{categories[data.category]}</a></nav>
   <p class="hub-eyebrow">{data.articleType?types[data.articleType]:'Engineering Fieldnote'}</p>
   <h1>{data.title}</h1><p class="document-description">{data.description}</p>
-  <div class="document-byline"><span>성하(aerofleet)</span><span>발행 <time datetime={data.pubDate.toISOString()}>{date(data.pubDate)}</time></span>{data.updatedDate&&<span>수정 <time datetime={data.updatedDate.toISOString()}>{date(data.updatedDate)}</time></span>}</div>
+  <div class="document-byline"><span>ITSDEV</span><span>발행 <time datetime={data.pubDate.toISOString()}>{date(data.pubDate)}</time></span>{data.updatedDate&&<span>수정 <time datetime={data.updatedDate.toISOString()}>{date(data.updatedDate)}</time></span>}</div>
  </header>
  <figure class="document-cover"><TopicArt category={data.category} prefix={`cover-${entry.id}`}/><figcaption>주제 개념도 · 실제 서비스 화면이 아닙니다.</figcaption></figure>
  <dl class="document-facts"><div><dt>문서번호</dt><dd class="mono">{data.documentId}</dd></div><div><dt>검증 상태</dt><dd class:list={[data.evidenceStatus!=='verified'&&'red']}>{statuses[data.evidenceStatus]}</dd></div>{revisions.length>0&&<div><dt>현재 개정</dt><dd class="mono">{revisions[0].rev}</dd></div>}{data.verifiedAt&&<div><dt>확인일</dt><dd>{date(data.verifiedAt)}</dd></div>}</dl>
