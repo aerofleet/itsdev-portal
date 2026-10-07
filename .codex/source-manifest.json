@@ -1,0 +1,43 @@
+[
+    {
+        "name":  "ITSDEV Fieldnotes 모션 시안.html",
+        "sha256":  "050531D3D2D0AE36A2010462390D7912CD3E1562023F0526297DA8CBF755691C",
+        "verified":  true
+    },
+    {
+        "name":  "prd.md",
+        "sha256":  "5191BD59D22F1FD29A2A3279B647DB077E9BDC5AE475D029E4919EDBFE7733E9",
+        "verified":  true
+    },
+    {
+        "name":  "rules.md",
+        "sha256":  "51D8A9ED664BD18B0D8B4941340C6671D78C31CF2F8774D3339532BBA329310F",
+        "verified":  true
+    },
+    {
+        "name":  "task.md",
+        "sha256":  "0D72259AC925D0F3FA1A0571D1D728C6C2CAEF593C86809409F8307F0CA7650E",
+        "verified":  true
+    },
+    {
+        "name":  "architecture.md",
+        "sha256":  "55F7961A71766089958C5AB2A0D5E6DAB927748D3005254FDDCD389394DDBD9A",
+        "verified":  true,
+        "originalName":  "architecture (1).md"
+    },
+    {
+        "name":  "ITSDEV-design-v8.md",
+        "sha256":  "345DCAEFDD0968EF70C77FF69C6F694ED5B9D11F6AC8E9AE5B9F29EB00104746",
+        "verified":  true
+    },
+    {
+        "name":  "ITSDEV-memory-v8.md",
+        "sha256":  "FC7281F6B9B0C6D09F2D1311FFF220B3AC9C3EBD8066B5E5CE3F2926866649C5",
+        "verified":  true
+    },
+    {
+        "name":  "ITSDEV-Fieldnotes-Preview.html",
+        "sha256":  "477BEB90C2ADFEDBBFCF01BC4ECF5D1296732DB5E372C5A3D88C68A23C35F197",
+        "verified":  true
+    }
+]

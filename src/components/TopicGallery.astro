@@ -1,0 +1,9 @@
+---
+import TopicArt from './TopicArt.astro';
+const topics=[
+ {category:'infra' as const,label:'인프라',title:'배포부터 복구까지, 경계를 설계하는 일',description:'어디까지 공개하고, 어떻게 배포하고, 무엇을 복구할지. 운영의 경계를 살펴봅니다.'},
+ {category:'backend' as const,label:'백엔드',title:'응답 뒤에 남은 데이터와 실패의 조건',description:'캐시와 원본, 대기와 일관성. 정상 응답 너머에서 확인해야 할 조건을 다룹니다.'},
+ {category:'ai' as const,label:'AI',title:'답변이 아니라, 답변의 근거를 묻습니다',description:'문서와 검색, 답변의 연결. 확인한 범위와 아직 모르는 것을 나누어 기록합니다.'},
+];
+---
+<div class="topic-gallery">{topics.map(topic=><article class="topic-card"><a class="topic-cover" href={`/articles/category/${topic.category}/`} aria-label={`${topic.label} 기록 둘러보기`}><TopicArt category={topic.category} prefix={`gallery-${topic.category}`}/><span class="cover-label">{topic.label}</span></a><div class="topic-copy"><p class="card-eyebrow">주제 안내</p><h3><a href={`/articles/category/${topic.category}/`}>{topic.title}</a></h3><p>{topic.description}</p><a class="card-link" href={`/articles/category/${topic.category}/`}>기록 둘러보기 <span aria-hidden="true">↗</span></a></div></article>)}</div>

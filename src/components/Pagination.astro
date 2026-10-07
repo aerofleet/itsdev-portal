@@ -1,0 +1,9 @@
+---
+interface Props { page: { currentPage: number; totalPages: number; url: { prev?: string; next?: string } }; }
+const { page } = Astro.props;
+---
+{page.totalPages > 1 && <nav class="pagination" aria-label="페이지">
+  <div>{page.url.prev && <a href={page.url.prev} rel="prev">이전 페이지</a>}</div>
+  <span aria-current="page">{page.currentPage} / {page.totalPages} 페이지</span>
+  <div>{page.url.next && <a href={page.url.next} rel="next">다음 페이지</a>}</div>
+</nav>}

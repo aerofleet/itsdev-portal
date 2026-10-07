@@ -1,0 +1,9 @@
+---
+import { categories } from '../lib/content';
+interface Props { active?: keyof typeof categories; }
+const { active } = Astro.props;
+---
+<nav class="category-links" aria-label="기록 분류">
+  <a href="/articles/" aria-current={!active ? 'page' : undefined}>전체</a>
+  {Object.entries(categories).map(([id, label]) => <a href={`/articles/category/${id}/`} aria-current={active === id ? 'page' : undefined}>{label}</a>)}
+</nav>

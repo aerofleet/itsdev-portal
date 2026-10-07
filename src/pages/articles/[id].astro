@@ -1,0 +1,41 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ArticleList from '../../components/ArticleList.astro';
+import TopicArt from '../../components/TopicArt.astro';
+import {publishedArticles,categories} from '../../lib/content';
+export async function getStaticPaths(){return (await publishedArticles()).map(entry=>({params:{id:entry.id},props:{entry}}))}
+const {entry}=Astro.props;
+const {data}=entry;
+const {Content,headings}=await render(entry);
+const related=(await publishedArticles()).filter(e=>e.id!==entry.id&&e.data.category===data.category).slice(0,3);
+const statuses={planned:'검증 예정',partial:'일부 검증',verified:'검증 완료'};
+const revisions=[...data.revisions].sort((a,b)=>b.date.valueOf()-a.date.valueOf());
+const toc=headings.filter(h=>h.depth===2||h.depth===3);
+const date=(value:Date)=>value.toISOString().slice(0,10);
+const types={design:'설계 기록',decision:'선택 기록',incident:'장애 기록',implementation:'구현 기록'};
+---
+<Base title={data.title} description={data.description} canonical={data.canonical} article={{published:data.pubDate.toISOString(),modified:data.updatedDate?.toISOString(),category:categories[data.category]}}>
+<article class="fieldnote">
+ <header class="document-header">
+  <nav class="breadcrumbs" aria-label="현재 위치"><a href="/articles/">기록</a><span aria-hidden="true">/</span><a href={`/articles/category/${data.category}/`}>{categories[data.category]}</a></nav>
+  <p class="hub-eyebrow">{data.articleType?types[data.articleType]:'Engineering Fieldnote'}</p>
+  <h1>{data.title}</h1><p class="document-description">{data.description}</p>
+  <div class="document-byline"><span>성하(aerofleet)</span><span>발행 <time datetime={data.pubDate.toISOString()}>{date(data.pubDate)}</time></span>{data.updatedDate&&<span>수정 <time datetime={data.updatedDate.toISOString()}>{date(data.updatedDate)}</time></span>}</div>
+ </header>
+ <figure class="document-cover"><TopicArt category={data.category} prefix={`cover-${entry.id}`}/><figcaption>주제 개념도 · 실제 서비스 화면이 아닙니다.</figcaption></figure>
+ <dl class="document-facts"><div><dt>문서번호</dt><dd class="mono">{data.documentId}</dd></div><div><dt>검증 상태</dt><dd class:list={[data.evidenceStatus!=='verified'&&'red']}>{statuses[data.evidenceStatus]}</dd></div>{revisions.length>0&&<div><dt>현재 개정</dt><dd class="mono">{revisions[0].rev}</dd></div>}{data.verifiedAt&&<div><dt>확인일</dt><dd>{date(data.verifiedAt)}</dd></div>}</dl>
+ <div class="reading-layout">
+  <aside class="reading-sidebar">
+   {toc.length>0&&<nav class="toc" aria-label="목차"><h2>이 글의 순서</h2><ol>{toc.map(h=><li class:list={[h.depth===3&&'subheading']}><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol></nav>}
+   {data.environment&&data.environment.length>0&&<section class="environment"><h2>적용 환경</h2><ul>{data.environment.map(item=><li>{item}</li>)}</ul></section>}
+   <a class="back-to-records" href={`/articles/category/${data.category}/`}>{categories[data.category]} 기록 더 보기</a>
+  </aside>
+  <div class="reading-body"><div class="prose"><Content/>
+   {data.evidence.length>0&&<section class="evidence-notes"><h2>검증 근거</h2><ul>{data.evidence.map(item=><li>{item}</li>)}</ul></section>}
+   {revisions.length>0&&<section class="revision-section"><h2>개정 이력</h2><div class="table-scroll" tabindex="0" role="region" aria-label="개정 이력 표"><table class="revision-table"><thead><tr><th scope="col">개정</th><th scope="col">날짜</th><th scope="col">변경 이유</th></tr></thead><tbody>{revisions.map((r,i)=><tr class:list={[i===0&&'latest']}><th scope="row">{r.rev}</th><td><time datetime={r.date.toISOString()}>{date(r.date)}</time></td><td>{r.summary}</td></tr>)}</tbody></table></div></section>}
+  </div>{data.tags.length>0&&<ul class="article-tags" aria-label="글 태그">{data.tags.map(tag=><li>{tag}</li>)}</ul>}</div>
+ </div>
+</article>
+{related.length>0&&<section class="related-records" aria-labelledby="related-title"><p class="hub-eyebrow">Keep reading</p><h2 id="related-title">함께 읽을 기록</h2><ArticleList articles={related}/></section>}
+</Base>

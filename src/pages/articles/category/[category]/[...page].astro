@@ -1,0 +1,19 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import ArticleList from '../../../../components/ArticleList.astro';
+import {publishedArticles,categories} from '../../../../lib/content';
+import {paginateRecords} from '../../../../lib/pagination';
+import CategoryNav from '../../../../components/CategoryNav.astro';
+import Pagination from '../../../../components/Pagination.astro';
+import type { GetStaticPaths } from 'astro';
+export const getStaticPaths=(async()=>{
+ const all=await publishedArticles();
+ return Object.entries(categories).flatMap(([category,label])=>{
+  const articles=all.filter(a=>a.data.category===category);
+  const base=`/articles/category/${category}/`;
+  return paginateRecords(articles,base).map(page=>({params:{category,page:page.currentPage===1?undefined:String(page.currentPage)},props:{label,category:category as keyof typeof categories,page}}));
+ });
+}) satisfies GetStaticPaths;
+const {label,page,category}=Astro.props;
+---
+<Base title={page.currentPage===1?label:`${label} · ${page.currentPage}페이지`}><header class="page-head library-head"><a href="/articles/">전체 기록</a><p class="hub-eyebrow">Engineering Fieldnotes</p><h1>{label}</h1></header><CategoryNav active={category}/><p class="result-count">공개 기록 {page.total}편</p><ArticleList articles={page.data}/><Pagination page={page}/></Base>

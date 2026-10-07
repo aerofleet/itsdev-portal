@@ -1,0 +1,51 @@
+---
+import '../assets/site.css';
+import '../assets/knowledge-hub.css';
+import '../assets/reading.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import LocalPreview from '../components/LocalPreview.astro';
+interface Props { title?: string; description?: string; canonical?: string; noindex?: boolean; article?: { published: string; modified?: string; category: string; }; }
+const {title='근거가 남는 운영의 기록',description='직접 만든 서비스와 운영의 기록. 선택의 이유부터 검증의 한계, 그리고 다음 개정까지.',canonical,noindex=false,article}=Astro.props;
+const fixture=process.env.ITSDEV_CONTENT_FIXTURES==='1';
+const url=canonical || new URL(Astro.url.pathname, Astro.site).href;
+const socialImage=new URL('/images/fieldnotes-og.png', Astro.site).href;
+const socialAlt='ITSDEV Engineering Fieldnotes — Build. Operate. Leave evidence.';
+---
+<!doctype html>
+<html lang="ko"><head>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
+  <title>{title} | ITSDEV</title><meta name="description" content={description}/>
+  <link rel="canonical" href={url}/><link rel="alternate" type="application/rss+xml" title="ITSDEV 기록" href="/rss.xml"/>
+  <meta property="og:title" content={title}/><meta property="og:description" content={description}/>
+  <meta property="og:url" content={url}/><meta property="og:type" content={article?'article':'website'}/>
+  <meta property="og:site_name" content="ITSDEV"/><meta property="og:locale" content="ko_KR"/>
+  <meta property="og:image" content={socialImage}/><meta property="og:image:type" content="image/png"/>
+  <meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta property="og:image:alt" content={socialAlt}/>
+  <meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content={title}/><meta name="twitter:description" content={description}/>
+  <meta name="twitter:image" content={socialImage}/><meta name="twitter:image:alt" content={socialAlt}/>
+  {article && <><meta property="article:published_time" content={article.published}/>{article.modified&&<meta property="article:modified_time" content={article.modified}/>}<meta property="article:section" content={article.category}/></>}
+  {(noindex||fixture) && <meta name="robots" content="noindex,follow"/>}
+  <script is:inline>try{const t=localStorage.getItem('itsdev-theme')||'dark';if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch{}</script>
+</head><body>
+<a href="#main" class="skip">본문으로 이동</a><div class="shell">
+<SiteHeader/><LocalPreview/>{fixture&&<p class="fixture-banner" role="note">콘텐츠 검증용 샘플 · 실제 발행 글이나 운영 성과가 아닙니다.</p>}<main id="main"><slot/></main>
+<footer class="hub-footer"><div><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">i</span>ITSDEV</a><p>직접 만든 서비스와 운영의 기록.<br/>만들고, 운영하고, 근거를 남깁니다.</p></div><nav aria-label="기록 탐색"><strong>둘러보기</strong><a href="/articles/">기록</a><a href="/services/">서비스</a><a href="/about/">소개와 기록 원칙</a><a href="/rss.xml">RSS</a></nav><nav aria-label="보조 메뉴"><strong>안내</strong><a href="/contact/">문의</a><a href="/privacy/">개인정보 안내</a><a href="/terms/">이용 안내</a></nav></footer>
+</div>
+<script>
+const root=document.documentElement;
+const theme=document.querySelector<HTMLButtonElement>('#theme');
+if(theme){
+ root.classList.add('enhanced');
+ const systemTheme=matchMedia('(prefers-color-scheme: dark)');
+ const isDark=()=>root.dataset.theme?root.dataset.theme==='dark':systemTheme.matches;
+ const syncTheme=()=>{const dark=isDark();theme.setAttribute('aria-pressed',String(dark));theme.title=dark?'밝은 화면으로 변경':'어두운 화면으로 변경'};
+ syncTheme();systemTheme.addEventListener('change',syncTheme);
+ theme.addEventListener('click',()=>{const t=isDark()?'light':'dark';root.dataset.theme=t;syncTheme();try{localStorage.setItem('itsdev-theme',t)}catch{}});
+ try{if(sessionStorage.getItem('itsdev-intro'))root.classList.add('intro-seen');sessionStorage.setItem('itsdev-intro','1')}catch{}
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+ const apply=()=>{root.dataset.motion=reduced.matches?'off':'on'};
+ reduced.addEventListener('change',apply);apply();
+}
+</script>
+</body></html>

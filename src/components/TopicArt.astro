@@ -1,0 +1,9 @@
+---
+import drawings from '../data/topic-art.json';
+interface Props { category: keyof typeof drawings; prefix: string; }
+const {category,prefix}=Astro.props;
+let markup=drawings[category];
+const ids=[...markup.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
+for(const id of ids)markup=markup.replaceAll(id,`${prefix}-${id}`);
+---
+<div class:list={['topic-art',`art-${category}`]} set:html={markup}/>

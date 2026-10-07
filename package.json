@@ -1,0 +1,47 @@
+{
+  "name": "itsdev-portal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host 127.0.0.1",
+    "build": "astro build",
+    "preview": "astro preview --host 127.0.0.1",
+    "check": "astro check",
+    "test:e2e": "playwright test",
+    "test:a11y": "npm run build:content && playwright test --config playwright.accessibility.config.ts",
+    "build:content": "node scripts/content-fixtures.mjs build",
+    "preview:content": "node scripts/content-fixtures.mjs preview",
+    "test:content": "node scripts/content-fixtures.mjs test",
+    "setup:windows": "npm install --force",
+    "verify": "node scripts/verify.mjs",
+    "assets:social": "node scripts/social-card.mjs",
+    "deploy:check": "wrangler deploy --dry-run",
+    "deploy": "node scripts/release-gate.mjs && wrangler deploy"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "7.3.2",
+    "@astrojs/rss": "4.0.19",
+    "astro": "7.3.6"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.63.0",
+    "@types/node": "26.6.4",
+    "parse5": "8.0.1",
+    "typescript": "6.0.3",
+    "wrangler": "4.148.0"
+  },
+  "engines": {
+    "node": ">=24.13.0"
+  },
+  "optionalDependencies": {
+    "@astrojs/compiler-binding-wasm32-wasi": "0.5.1"
+  },
+  "overrides": {
+    "miniflare": {
+      "sharp": "0.35.5"
+    }
+  }
+}

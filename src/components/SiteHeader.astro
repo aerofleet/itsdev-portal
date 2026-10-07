@@ -1,0 +1,5 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+const current=Astro.url.pathname;
+---
+<header class="nav" id="top"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">i</span>ITSDEV</a><nav class="navlinks" aria-label="주요 메뉴"><a href="/articles/" aria-current={current.startsWith('/articles/')?'page':undefined}>기록</a><a href="/services/" aria-current={current.startsWith('/services/')?'page':undefined}>서비스</a><a href="/about/" aria-current={current==='/about/'?'page':undefined}>기록 원칙</a></nav><div class="controls js-only"><ThemeToggle/></div></header>

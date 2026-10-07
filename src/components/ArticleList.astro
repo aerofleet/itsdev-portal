@@ -1,0 +1,10 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { categories } from '../lib/content';
+import TopicArt from './TopicArt.astro';
+interface Props { articles: CollectionEntry<'articles'>[]; }
+const {articles}=Astro.props;
+---
+<div class="article-list">
+{articles.length ? articles.map(({id,data})=><article class="article-card"><a class="article-cover" href={`/articles/${id}/`} aria-label={data.title}><TopicArt category={data.category} prefix={`article-${id}`}/></a><div class="article-copy"><p class="meta">{categories[data.category]} · <time datetime={data.pubDate.toISOString()}>{data.pubDate.toISOString().slice(0,10)}</time></p><h2><a href={`/articles/${id}/`}>{data.title}</a></h2><p>{data.description}</p><a class="card-link" href={`/articles/${id}/`}>기록 읽기 <span aria-hidden="true">↗</span></a></div></article>) : <p class="empty">아직 공개한 기록이 없습니다. 환경과 검증 근거를 확인한 글부터 발행합니다.</p>}
+</div>
