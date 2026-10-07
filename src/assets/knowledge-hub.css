@@ -1,4 +1,9 @@
 /* PULSEFORM-inspired editorial hierarchy, with ITSDEV's own diagrams and content. */
+.service-plate.service-thumbnail{display:block;min-height:0;padding:0;overflow:hidden}
+.service-thumbnail>a{display:block;background:#fff}
+.service-thumbnail img{display:block;width:100%;height:auto}
+.service-thumbnail figcaption{padding:12px 18px;color:var(--plate-muted)}
+.service-thumbnail>a:focus-visible{outline-offset:-4px}
 
 
 
