@@ -34,11 +34,14 @@ if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(collection)) {
 }
 
 const endpoint = new URL(`/items/${collection}`, apiOrigin);
+const omittedOptionalMetadata = new Set();
 const fields = [
   'id', 'slug', 'title', 'description', 'documentId', 'pubDate', 'updatedDate',
   'category', 'tags', 'articleType', 'service', 'featured', 'canonical',
   'environment', 'evidenceStatus', 'verifiedAt', 'evidence', 'revisions', 'body', 'status',
 ];
+const articleTypes = ['design', 'decision', 'incident', 'implementation'];
+const services = ['djc', 'withbuddy', 'myai'];
 const headers = { Accept: 'application/json' };
 if (!publicRead) headers.Authorization = `Bearer ${token}`;
 if (accessId) {
@@ -58,6 +61,16 @@ function recordToMarkdown(record) {
   for (const field of ['title', 'description', 'documentId', 'pubDate', 'category', 'tags', 'evidenceStatus', 'body']) {
     if (record[field] == null) throw new Error(`Missing ${field} in Directus item ${record.id}`);
   }
+  const articleType = articleTypes.includes(record.articleType) ? record.articleType : undefined;
+  const service = services.includes(record.service) ? record.service : undefined;
+  const canonical = typeof record.canonical === 'string' && /^https:\/\//i.test(record.canonical) ? record.canonical : undefined;
+  const environment = Array.isArray(record.environment) && record.environment.every((value) => typeof value === 'string')
+    ? record.environment
+    : undefined;
+  if (record.articleType != null && articleType === undefined) omittedOptionalMetadata.add('articleType');
+  if (record.service != null && service === undefined) omittedOptionalMetadata.add('service');
+  if (record.canonical != null && canonical === undefined) omittedOptionalMetadata.add('canonical');
+  if (record.environment != null && environment === undefined) omittedOptionalMetadata.add('environment');
   const frontmatter = {
     title: record.title,
     description: record.description,
@@ -68,11 +81,11 @@ function recordToMarkdown(record) {
     tags: record.tags,
     draft: false,
     sample: false,
-    articleType: record.articleType,
-    service: record.service,
+    articleType,
+    service,
     featured: record.featured ?? false,
-    canonical: record.canonical,
-    environment: record.environment,
+    canonical,
+    environment,
     evidenceStatus: record.evidenceStatus,
     verifiedAt: record.verifiedAt,
     evidence: record.evidence ?? [],
@@ -127,4 +140,7 @@ await fs.mkdir(path.dirname(output), { recursive: true });
 await fs.rm(output, { recursive: true, force: true });
 await fs.mkdir(output, { recursive: true });
 for (const [slug, markdown] of rendered) await fs.writeFile(path.join(output, `${slug}.md`), markdown, { flag: 'wx' });
+if (omittedOptionalMetadata.size > 0) {
+  console.warn(`Omitted unsupported optional Directus metadata field(s): ${[...omittedOptionalMetadata].sort().join(', ')}.`);
+}
 console.log(`Directus sync complete: ${rendered.length} published article(s) staged; ${scheduled} future article(s) withheld.`);
