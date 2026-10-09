@@ -18,6 +18,7 @@ jobs:
       - name: Sync published Directus articles
         env:
           DIRECTUS_CONTENTS_ENABLED: ${{ vars.DIRECTUS_CONTENTS_ENABLED }}
+          DIRECTUS_PUBLIC_READ: ${{ vars.DIRECTUS_PUBLIC_READ || 'true' }}
           DIRECTUS_API_URL: ${{ secrets.DIRECTUS_API_URL }}
           DIRECTUS_READ_TOKEN: ${{ secrets.DIRECTUS_READ_TOKEN }}
           DIRECTUS_ARTICLES_COLLECTION: ${{ vars.DIRECTUS_ARTICLES_COLLECTION || 'fieldnotes' }}
@@ -25,8 +26,8 @@ jobs:
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
         run: |
           if [ "$DIRECTUS_CONTENTS_ENABLED" = "true" ]; then
-            if [ -z "$DIRECTUS_API_URL" ] || [ -z "$DIRECTUS_READ_TOKEN" ]; then
-              echo "Directus is enabled but API credentials are missing." >&2
+            if [ -z "$DIRECTUS_API_URL" ] || { [ "$DIRECTUS_PUBLIC_READ" != "true" ] && [ -z "$DIRECTUS_READ_TOKEN" ]; }; then
+              echo "Directus is enabled but the API URL or required read credentials are missing." >&2
               exit 1
             fi
             npm run cms:sync

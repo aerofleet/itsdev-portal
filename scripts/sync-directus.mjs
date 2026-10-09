@@ -4,13 +4,14 @@ import process from 'node:process';
 
 const api = process.env.DIRECTUS_API_URL;
 const token = process.env.DIRECTUS_READ_TOKEN;
+const publicRead = process.env.DIRECTUS_PUBLIC_READ === 'true';
 const accessId = process.env.CF_ACCESS_CLIENT_ID;
 const accessSecret = process.env.CF_ACCESS_CLIENT_SECRET;
 const collection = process.env.DIRECTUS_ARTICLES_COLLECTION || 'fieldnotes';
 const output = path.resolve('.codex/directus-content/articles');
 
-if (!api || !token) {
-  console.error('CMS sync requires DIRECTUS_API_URL and DIRECTUS_READ_TOKEN.');
+if (!api || (!token && !publicRead)) {
+  console.error('CMS sync requires DIRECTUS_API_URL and either DIRECTUS_READ_TOKEN or DIRECTUS_PUBLIC_READ=true.');
   process.exit(1);
 }
 let apiOrigin;
@@ -37,7 +38,8 @@ const fields = [
   'category', 'tags', 'articleType', 'service', 'featured', 'canonical',
   'environment', 'evidenceStatus', 'verifiedAt', 'evidence', 'revisions', 'body', 'status',
 ];
-const headers = { Authorization: `Bearer ${token}`, Accept: 'application/json' };
+const headers = { Accept: 'application/json' };
+if (!publicRead) headers.Authorization = `Bearer ${token}`;
 if (accessId) {
   headers['CF-Access-Client-Id'] = accessId;
   headers['CF-Access-Client-Secret'] = accessSecret;
