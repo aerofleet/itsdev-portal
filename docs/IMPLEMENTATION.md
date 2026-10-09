@@ -1,5 +1,13 @@
 # 포털 구현 상태 · 2026-10-07
 
+## 2026-10-09 · Directus CMS 정적 발행 연결 준비
+
+- `scripts/sync-directus.mjs`가 Directus 공개 콘텐츠를 임시 Markdown으로 동기화하고 Astro 정적 컬렉션에 공급한다. 앱 런타임 요청이나 DB 연결은 없다.
+- GitHub Actions는 `DIRECTUS_CONTENTS_ENABLED=true`일 때만 동기화한다. API/Access 자격증명은 GitHub Secrets에서 주입하며 콘텐츠 파일은 저장소에 커밋하지 않는다. 활성화했지만 기본 API 자격증명이 없으면 빌드를 실패시킨다.
+- 합격 기준: 공개 상태·발행일이 유효한 문서만 RSS/sitemap/정적 HTML에 포함, slug/documentId 중복 0건, 비밀값 출력 0건.
+- 아직 미완료: Directus collection/최소 읽기 role, Cloudflare Tunnel/Access, GitHub Secrets/Variables 구성 및 실제 CMS 결과의 CI 검증. `docs/DIRECTUS.md`에 계약과 순서를 기록했다.
+- CMS는 OCI + HeatWave에 남고, 포털 정적 자산만 Cloudflare Workers로 배포한다.
+
 ## 최신 추가 · 접근성 자동 검사와 테마 버튼
 
 - 사용자 요청에 따라 해/달 버튼으로 테마 전환을 제공하고 모션 버튼을 제거했다. 키보드와 저장된 테마, OS 모션 감소 설정을 유지한다.

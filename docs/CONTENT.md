@@ -1,6 +1,6 @@
 # 기록 작성과 발행
 
-실제 원본은 `src/content/articles/{slug}.md`에 둡니다. 파일명은 영문 소문자·숫자·하이픈으로 작성합니다. 숫자로만 된 이름과 `category`는 목록 경로와 충돌하므로 빌드에서 거부합니다.
+로컬 작성 원본은 `src/content/articles/{slug}.md`에 둡니다. Cloudflare/GitHub CMS 연결을 활성화하면 Directus `fieldnotes` 컬렉션의 공개 항목을 빌드 시 읽습니다. 필드와 권한은 [Directus 발행 연결](DIRECTUS.md)을 참고하세요. 파일명/slug는 영문 소문자·숫자·하이픈으로 작성합니다. 숫자로만 된 이름과 `category`는 목록 경로와 충돌하므로 빌드에서 거부합니다.
 
 ## 작성 순서
 

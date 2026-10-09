@@ -2,7 +2,7 @@ import { defineCollection } from 'astro:content';
 import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
 const articles=defineCollection({
- loader:glob({pattern:'**/*.md',base:process.env.ITSDEV_CONTENT_FIXTURES==='1'?'./.codex/content-fixtures':'./src/content/articles'}),
+ loader:glob({pattern:'**/*.md',base:process.env.ITSDEV_CONTENT_FIXTURES==='1'?'./.codex/content-fixtures':process.env.ITSDEV_CONTENT_SOURCE==='directus'?'./.codex/directus-content/articles':'./src/content/articles'}),
  schema:z.object({
   title:z.string().min(1),description:z.string().min(1),documentId:z.string().min(1),
   pubDate:z.coerce.date(),updatedDate:z.coerce.date().optional(),
