@@ -67,6 +67,10 @@ function recordToMarkdown(record) {
   const environment = Array.isArray(record.environment) && record.environment.every((value) => typeof value === 'string')
     ? record.environment
     : undefined;
+  const updatedDate = record.updatedDate == null ? undefined : parseDirectusDate(record.updatedDate);
+  const verifiedAt = record.verifiedAt == null ? undefined : parseDirectusDate(record.verifiedAt);
+  if (updatedDate && !Number.isFinite(updatedDate.getTime())) throw new Error(`Invalid updatedDate in Directus item ${record.id}`);
+  if (verifiedAt && !Number.isFinite(verifiedAt.getTime())) throw new Error(`Invalid verifiedAt in Directus item ${record.id}`);
   if (record.articleType != null && articleType === undefined) omittedOptionalMetadata.add('articleType');
   if (record.service != null && service === undefined) omittedOptionalMetadata.add('service');
   if (record.canonical != null && canonical === undefined) omittedOptionalMetadata.add('canonical');
@@ -76,7 +80,7 @@ function recordToMarkdown(record) {
     description: record.description,
     documentId: record.documentId,
     pubDate: record.pubDate,
-    updatedDate: record.updatedDate,
+    updatedDate: updatedDate?.toISOString(),
     category: record.category,
     tags: record.tags,
     draft: false,
@@ -87,7 +91,7 @@ function recordToMarkdown(record) {
     canonical,
     environment,
     evidenceStatus: record.evidenceStatus,
-    verifiedAt: record.verifiedAt,
+    verifiedAt: verifiedAt?.toISOString(),
     evidence: record.evidence ?? [],
     revisions: record.revisions ?? [],
   };
