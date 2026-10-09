@@ -25,7 +25,7 @@ Directus는 OCI에서 운영하고 HeatWave의 전용 `itsdevcms` 데이터베�
 | `evidence` | 문자열 배열(JSON) | 아니오 |
 | `revisions` | `{rev,date,summary}` 객체 배열(JSON) | 아니오 |
 
-정적 빌드는 기본적으로 Directus의 익명 Public 권한으로 콘텐츠를 읽는다. Public 정책은 `fieldnotes`의 Read만 허용하고, 항목 규칙을 `status=published`로 제한한다. 포털에서 사용하는 필드만 읽기 허용하며 create/update/delete와 다른 컬렉션은 공개하지 않는다. 동기화는 `status=published` 및 `pubDate <= 현재 시각`을 적용한다. 사용자 토큰 방식이 필요하면 `DIRECTUS_PUBLIC_READ=false`로 전환하고 `DIRECTUS_READ_TOKEN`을 설정한다.
+정적 빌드는 기본적으로 Directus의 익명 Public 권한으로 콘텐츠를 읽는다. Public 정책은 `fieldnotes`의 Read만 허용하고, 항목 규칙을 `status=published`로 제한한다. 포털에서 사용하는 필드만 읽기 허용하며 create/update/delete와 다른 컬렉션은 공개하지 않는다. 동기화는 `status=published`인 항목을 읽고 `pubDate <= 현재 시각`을 빌드에서 적용한다. Directus가 시간대 없는 날짜/시간을 반환하면 한국 표준시(+09:00)로 해석하며, API가 명시한 시간대가 있으면 해당 절대 시각을 사용한다. 사용자 토큰 방식이 필요하면 `DIRECTUS_PUBLIC_READ=false`로 전환하고 `DIRECTUS_READ_TOKEN`을 설정한다.
 
 ## GitHub Actions 설정
 

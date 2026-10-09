@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { parseDirectusDate } from './directus-date.mjs';
 
 const api = process.env.DIRECTUS_API_URL;
 const token = process.env.DIRECTUS_READ_TOKEN;
@@ -89,7 +90,6 @@ for (let page = 1; ; page += 1) {
   const url = new URL(endpoint);
   url.searchParams.set('fields', fields.join(','));
   url.searchParams.set('filter[status][_eq]', 'published');
-  url.searchParams.set('filter[pubDate][_lte]', now.toISOString());
   url.searchParams.set('sort', 'slug');
   url.searchParams.set('limit', '100');
   url.searchParams.set('page', String(page));
@@ -105,38 +105,26 @@ for (let page = 1; ; page += 1) {
   if (page >= 100) throw new Error('Directus result exceeds the 10,000 article safety limit.');
 }
 
-if (collected.length === 0 && process.env.DIRECTUS_SYNC_DIAGNOSTICS === 'true') {
-  const probeUrl = new URL(endpoint);
-  probeUrl.searchParams.set('fields', '*');
-  probeUrl.searchParams.set('limit', '10');
-  const probeResponse = await fetch(probeUrl, { headers, redirect: 'error', signal: AbortSignal.timeout(20_000) });
-  if (!probeResponse.ok) {
-    console.error(`Directus diagnostic probe returned HTTP ${probeResponse.status}.`);
-  } else {
-    const probePayload = await probeResponse.json();
-    const visibleItems = Array.isArray(probePayload.data) ? probePayload.data : [];
-    const visibleFields = [...new Set(visibleItems.flatMap((item) => Object.keys(item)))].sort();
-    const statuses = [...new Set(visibleItems.map((item) => String(item.status ?? '<missing>')))].sort();
-    const pubDates = [...new Set(visibleItems.map((item) => String(item.pubDate ?? '<missing>')))].sort();
-    console.error(`Directus diagnostic: public rows=${visibleItems.length}; visible fields=${visibleFields.join(',') || '<none>'}; status values=${statuses.join(',') || '<none>'}; pubDate values=${pubDates.join(',') || '<none>'}.`);
-  }
-}
-
 const slugs = new Set();
 const documentIds = new Set();
-const rendered = collected.map((record) => {
+let scheduled = 0;
+const rendered = collected.flatMap((record) => {
   if (record.status !== 'published') throw new Error(`Unpublished item returned: ${record.id}`);
+  const pubDate = parseDirectusDate(record.pubDate);
+  if (!Number.isFinite(pubDate.getTime())) throw new Error(`Invalid pubDate in Directus item ${record.id}`);
+  if (pubDate > now) {
+    scheduled += 1;
+    return [];
+  }
   if (slugs.has(record.slug)) throw new Error(`Duplicate Directus article slug: ${record.slug}`);
   if (documentIds.has(record.documentId)) throw new Error(`Duplicate Directus documentId: ${record.documentId}`);
   slugs.add(record.slug);
   documentIds.add(record.documentId);
-  const pubDate = new Date(record.pubDate);
-  if (!Number.isFinite(pubDate.getTime()) || pubDate > now) throw new Error(`Invalid or future pubDate in Directus item ${record.id}`);
-  return [record.slug, recordToMarkdown(record)];
+  return [[record.slug, recordToMarkdown({ ...record, pubDate: pubDate.toISOString() })]];
 });
 
 await fs.mkdir(path.dirname(output), { recursive: true });
 await fs.rm(output, { recursive: true, force: true });
 await fs.mkdir(output, { recursive: true });
 for (const [slug, markdown] of rendered) await fs.writeFile(path.join(output, `${slug}.md`), markdown, { flag: 'wx' });
-console.log(`Directus sync complete: ${rendered.length} published article(s) staged.`);
+console.log(`Directus sync complete: ${rendered.length} published article(s) staged; ${scheduled} future article(s) withheld.`);
