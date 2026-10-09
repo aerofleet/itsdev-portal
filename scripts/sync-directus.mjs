@@ -117,7 +117,8 @@ if (collected.length === 0 && process.env.DIRECTUS_SYNC_DIAGNOSTICS === 'true') 
     const visibleItems = Array.isArray(probePayload.data) ? probePayload.data : [];
     const visibleFields = [...new Set(visibleItems.flatMap((item) => Object.keys(item)))].sort();
     const statuses = [...new Set(visibleItems.map((item) => String(item.status ?? '<missing>')))].sort();
-    console.error(`Directus diagnostic: public rows=${visibleItems.length}; visible fields=${visibleFields.join(',') || '<none>'}; status values=${statuses.join(',') || '<none>'}.`);
+    const pubDates = [...new Set(visibleItems.map((item) => String(item.pubDate ?? '<missing>')))].sort();
+    console.error(`Directus diagnostic: public rows=${visibleItems.length}; visible fields=${visibleFields.join(',') || '<none>'}; status values=${statuses.join(',') || '<none>'}; pubDate values=${pubDates.join(',') || '<none>'}.`);
   }
 }
 
