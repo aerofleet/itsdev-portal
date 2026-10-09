@@ -105,6 +105,22 @@ for (let page = 1; ; page += 1) {
   if (page >= 100) throw new Error('Directus result exceeds the 10,000 article safety limit.');
 }
 
+if (collected.length === 0 && process.env.DIRECTUS_SYNC_DIAGNOSTICS === 'true') {
+  const probeUrl = new URL(endpoint);
+  probeUrl.searchParams.set('fields', '*');
+  probeUrl.searchParams.set('limit', '10');
+  const probeResponse = await fetch(probeUrl, { headers, redirect: 'error', signal: AbortSignal.timeout(20_000) });
+  if (!probeResponse.ok) {
+    console.error(`Directus diagnostic probe returned HTTP ${probeResponse.status}.`);
+  } else {
+    const probePayload = await probeResponse.json();
+    const visibleItems = Array.isArray(probePayload.data) ? probePayload.data : [];
+    const visibleFields = [...new Set(visibleItems.flatMap((item) => Object.keys(item)))].sort();
+    const statuses = [...new Set(visibleItems.map((item) => String(item.status ?? '<missing>')))].sort();
+    console.error(`Directus diagnostic: public rows=${visibleItems.length}; visible fields=${visibleFields.join(',') || '<none>'}; status values=${statuses.join(',') || '<none>'}.`);
+  }
+}
+
 const slugs = new Set();
 const documentIds = new Set();
 const rendered = collected.map((record) => {

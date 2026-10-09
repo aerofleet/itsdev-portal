@@ -19,6 +19,7 @@ jobs:
         env:
           DIRECTUS_CONTENTS_ENABLED: ${{ vars.DIRECTUS_CONTENTS_ENABLED }}
           DIRECTUS_PUBLIC_READ: ${{ vars.DIRECTUS_PUBLIC_READ || 'true' }}
+          DIRECTUS_SYNC_DIAGNOSTICS: ${{ github.ref != 'refs/heads/main' && 'true' || 'false' }}
           DIRECTUS_API_URL: ${{ secrets.DIRECTUS_API_URL }}
           DIRECTUS_READ_TOKEN: ${{ secrets.DIRECTUS_READ_TOKEN }}
           DIRECTUS_ARTICLES_COLLECTION: ${{ vars.DIRECTUS_ARTICLES_COLLECTION || 'fieldnotes' }}
