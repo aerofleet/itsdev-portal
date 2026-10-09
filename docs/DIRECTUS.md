@@ -39,6 +39,8 @@ Repository Variable `DIRECTUS_CONTENTS_ENABLED=true`를 설정하면 공개 buil
 
 동기화 스크립트는 `.codex/directus-content/articles/` 아래에 공개 발행 글을 임시 Markdown으로 생성한다. 이 데이터는 Git에 추가하지 않는다. slug/documentId 중복, 누락 필드, 날짜 및 slug 형식을 거부하며 API 오류 응답 본문과 비밀값을 로그에 출력하지 않는다.
 
+메인 브랜치의 GitHub Actions는 검사·빌드·dry-run이 통과하면 Cloudflare Worker를 `itsdev.kr/*`에 배포한 뒤 동기화된 각 글의 공개 상세 경로를 HTTP smoke test한다. 배포에 필요한 Repository Secrets는 `CLOUDFLARE_API_TOKEN`과 `CLOUDFLARE_ACCOUNT_ID`다. feature branch와 pull request에서는 실제 배포하지 않는다.
+
 ## 검증과 출시 기준
 
 - OKR 연결: 검수된 글을 Directus에서 관리하고 정적 포털로 공개 발행한다.

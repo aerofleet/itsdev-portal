@@ -17,6 +17,7 @@
     "cms:sync": "node scripts/sync-directus.mjs",
     "setup:windows": "npm install --force",
     "verify": "node scripts/verify.mjs",
+    "smoke:production": "node scripts/smoke-production.mjs",
     "assets:social": "node scripts/social-card.mjs",
     "deploy:check": "wrangler deploy --dry-run",
     "deploy": "node scripts/release-gate.mjs && wrangler deploy"
