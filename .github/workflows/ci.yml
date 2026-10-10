@@ -17,6 +17,7 @@ jobs:
       - run: npm run check
       - run: npm run test:directus-date
       - run: node --test scripts/smoke-route.test.mjs
+      - run: npm run test:monitor
       - name: Sync published Directus articles
         env:
           DIRECTUS_CONTENTS_ENABLED: ${{ vars.DIRECTUS_CONTENTS_ENABLED }}

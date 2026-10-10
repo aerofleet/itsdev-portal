@@ -1,6 +1,15 @@
 # 포털 구현 상태 · 2026-10-07
 
-> 아래 2026-10-07 이하 기록은 해당 시점의 스냅샷이다. 현재 운영 상태와 후속 작업은 맨 위 2026-10-10 재검토를 우선한다.
+## 2026-10-11 재검토 · 운영 모니터링 구현
+
+- AdSense 계정·동의·광고 검수는 사용자 요청대로 보류한다. activation 변수는 수정하지 않았다.
+- T-503 구현: `.github/workflows/production-monitor.yml`이 15분마다 공개 홈, 글 목록, 목록에서 선택한 글 상세를 3회(30초 간격) 검사한다. 3회 연속 실패에만 GitHub issue를 열고, 기존 이슈를 갱신해 중복을 억제한다. 3회 연속 성공 시 열린 이슈를 닫으며 혼합 결과는 기존 상태를 유지한다.
+- 운영 절차와 합격 기준은 `docs/OPERATIONS.md`에 기록했다. 알림 수신은 저장소 이슈 notification 구독 설정에 의존한다. 이 브랜치에서 오프라인 평가셋 3/3 통과했으며, scheduled workflow의 실제 실행/이슈 생성·복구는 main 반영 후 확인해야 한다. 그러므로 T-503 운영 확인은 아직 미완료다.
+- T-504는 운영 Worker 버전 변경을 수반해 실제 rollback을 수행하지 않았다. `docs/OPERATIONS.md`에 Wrangler `rollback <VERSION_ID>` 절차와 AdSense loader가 포함된 이전 버전을 피해야 하는 조건을 기록했다. 운영 리허설은 여전히 미완료다.
+- KPI/OKR: 독자가 현재 포털과 게시 글에 도달 가능한 상태를 유지. 평가셋은 3회 × 홈/목록/대표 글 상세, 요청당 timeout 10초, 실행 간격 30초다. 합격 기준은 3/3 실패 시 incident 1개, 혼합 결과 무변경, 3/3 성공 시 기존 incident 종료다. 구현 직전 반복 monitor/alert 없음 → 구현 후 자동 workflow와 deduplicated issue lifecycle 구성. 실제 main run 증거는 아직 없다.
+- 검증: `npm run test:monitor` 3/3, `npm run check` 51파일 오류/경고/hint 0, `npm run build` 14페이지, `npm run verify` 내부 링크 266개·오류 0·원본 해시 8/8.
+
+> 아래 2026-10-07 이하 기록은 해당 시점의 스냅샷이다. 현재 운영 상태와 후속 작업은 가장 최근 날짜의 재검토를 우선한다.
 
 ## 2026-10-10 재검토 · 배포/Directus/AdSense 게이트
 
