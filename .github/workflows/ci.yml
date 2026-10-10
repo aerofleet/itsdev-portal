@@ -50,6 +50,11 @@ jobs:
           ITSDEV_CONTENT_SOURCE: ${{ vars.DIRECTUS_CONTENTS_ENABLED == 'true' && 'directus' || '' }}
           DIRECTUS_API_URL: ${{ secrets.DIRECTUS_API_URL }}
           DIRECTUS_READ_TOKEN: ${{ secrets.DIRECTUS_READ_TOKEN }}
+          ADSENSE_ENABLED: ${{ vars.ADSENSE_ENABLED }}
+          ADSENSE_ACCOUNT_READY: ${{ vars.ADSENSE_ACCOUNT_READY }}
+          ADSENSE_CONSENT_READY: ${{ vars.ADSENSE_CONSENT_READY }}
+          ADSENSE_ADS_TXT_READY: ${{ vars.ADSENSE_ADS_TXT_READY }}
+          ADSENSE_PERFORMANCE_READY: ${{ vars.ADSENSE_PERFORMANCE_READY }}
       - run: npm run verify
       - run: npm run test:e2e
       - run: npm run deploy:check

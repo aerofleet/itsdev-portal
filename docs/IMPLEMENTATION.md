@@ -1,11 +1,26 @@
 # 포털 구현 상태 · 2026-10-07
 
+> 아래 2026-10-07 이하 기록은 해당 시점의 스냅샷이다. 현재 운영 상태와 후속 작업은 맨 위 2026-10-10 재검토를 우선한다.
+
+## 2026-10-10 재검토 · 배포/Directus/AdSense 게이트
+
+- Directus 정적 발행은 운영 중이다. `main` Actions 실행 `38052043812` (merge commit `be90821`)에서 콘텐츠 동기화, 검사, Worker 배포, article smoke가 성공했다. `https://itsdev.kr/articles/`와 `/articles/directus-cms-first-post/`는 각각 HTTP 200이며 상세 HTML에 `<article class="fieldnote">`가 있다. 이 확인은 현재 CI에 동기화된 글 전체 수나 Directus role 최소권한 감사를 증명하지 않는다.
+- Ads.txt는 AdSense snippet에서 받은 publisher ID `pub-4914947814475214`로 작성한다. AdSense 사이트의 `Ready`, Google이 요구하는 적용 지역의 동의 설정, AdSense의 ads.txt `Authorized`, 광고 레이아웃 검수 결과는 이 저장소/Actions에서 관측할 수 없어 미확인이다.
+- 승인 전 광고 송출을 막기 위해 loader는 `ADSENSE_ENABLED`, `ADSENSE_ACCOUNT_READY`, `ADSENSE_CONSENT_READY`, `ADSENSE_ADS_TXT_READY`, `ADSENSE_PERFORMANCE_READY`가 모두 `true`일 때만 출력한다. fixture 빌드에서는 항상 빠진다. main CI는 해당 GitHub Variables를 빌드에 전달한다. 모든 gate 증거를 확인하기 전에는 이 변수들을 활성화하지 않는다.
+- 운영 합격 기준: 해당 다섯 조건 미충족 시 공개 HTML의 AdSense loader 0건, `/ads.txt` HTTP 200 및 기대 publisher 행 1건, 콘텐츠 목록/상세 smoke 전부 성공. 활성화 후에는 승인된 CMP, no-fill/filled 레이아웃의 CLS ≤0.1 및 상세 페이지 최대 2개 배치를 별도로 확인한다.
+- 남은 수익화 작업: AdSense 계정/사이트 `Ready`와 ads.txt `Authorized` 확인, 적용 지역 및 Google 인증 CMP 설정, no-fill/filled 레이아웃과 CLS 측정, 실제 활성화 후 public smoke. Google 계정 대시보드 접근이 없어 현재 승인 상태는 판정 보류다.
+- Task 상태: T-501은 publisher ID를 받았고 ads.txt/응답 검증을 준비 중이며 dashboard `Ready`/`Authorized` 확인은 미완료. T-502는 로더 다중 gate 적용 후 OFF. T-503 alert/runbook, T-504 rollback rehearsal, T-505 30일 baseline은 미완료.
+- 남은 포털 출시 작업: 저자 검수된 대표 글 5편과 공개 연락처/정책, 실기기·스크린리더·200% 확대 및 Safari/Firefox, 3개 대표 페이지의 모바일 LCP/CLS 반복 측정, 이전 Worker version rollback 리허설. CI 배포와 article smoke는 작동하지만 rollback은 아직 리허설되지 않았다.
+- KPI/평가셋: 광고 비활성 상태에서 loader 0건, ads.txt 행·응답 1/1, Directus article route 목록/상세 HTTP 200; 수익·광고 성능은 미측정. AdSense가 `Ready`로 바뀌면 광고 미노출/채움 각 3회 × 상세 페이지 2개에서 CLS ≤0.1, 링크/본문 가림 0건을 합격 기준으로 한다.
+
+Google 공식 기준: [사이트 승인 상태](https://support.google.com/adsense/answer/12170222?hl=en), [ads.txt 형식 및 재확인](https://support.google.com/adsense/answer/12171612?hl=en), [EEA/UK/스위스 게시자 동의 요건](https://support.google.com/adsense/answer/13554116?hl=en).
+
 ## 2026-10-09 · Directus CMS 정적 발행 연결 준비
 
 - `scripts/sync-directus.mjs`가 Directus 공개 콘텐츠를 임시 Markdown으로 동기화하고 Astro 정적 컬렉션에 공급한다. 앱 런타임 요청이나 DB 연결은 없다.
 - GitHub Actions는 `DIRECTUS_CONTENTS_ENABLED=true`일 때만 동기화한다. API/Access 자격증명은 GitHub Secrets에서 주입하며 콘텐츠 파일은 저장소에 커밋하지 않는다. 활성화했지만 기본 API 자격증명이 없으면 빌드를 실패시킨다.
 - 합격 기준: 공개 상태·발행일이 유효한 문서만 RSS/sitemap/정적 HTML에 포함, slug/documentId 중복 0건, 비밀값 출력 0건.
-- 아직 미완료: Directus collection/최소 읽기 role, Cloudflare Tunnel/Access, GitHub Secrets/Variables 구성 및 실제 CMS 결과의 CI 검증. `docs/DIRECTUS.md`에 계약과 순서를 기록했다.
+- 2026-10-10 재검토에서 실제 CMS 동기화·운영 배포·article smoke가 CI에서 성공했다. Directus role 최소 권한 감사는 별도 증거가 없어 미완료로 둔다. Cloudflare Tunnel/Access 및 GitHub Secrets 구성은 현행 `docs/DIRECTUS.md` 계약과 운영 연결을 기준으로 추가 확인한다.
 - CMS는 OCI + HeatWave에 남고, 포털 정적 자산만 Cloudflare Workers로 배포한다.
 
 ## 최신 추가 · 접근성 자동 검사와 테마 버튼
@@ -57,7 +72,7 @@
 
 T-003 로컬 폴더/콘텐츠 경계, T-201B 컴포넌트/테마/모션, T-202 기본 정적 경로, T-204 schema/RSS/canonical/sitemap, T-205 assets/404 구성의 초기 구현이다. 이 기록은 해당 Task 전체의 완료 선언이 아니다.
 
-문서번호 중복은 빌드 시 검사하며 draft/sample은 상세·목록·RSS에서 제외한다. 검증 완료 상태에는 확인 날짜와 근거 참조를 요구한다. REV는 명시적 배열이며 개정 없는 글에는 표를 출력하지 않는다. 광고와 분석 스크립트는 없다.
+문서번호 중복은 빌드 시 검사하며 draft/sample은 상세·목록·RSS에서 제외한다. 검증 완료 상태에는 확인 날짜와 근거 참조를 요구한다. REV는 명시적 배열이며 개정 없는 글에는 표를 출력하지 않는다. AdSense 스크립트는 계정/동의/ads.txt/레이아웃 gate가 모두 확인되기 전까지 비활성으로 유지하며 분석 스크립트는 없다.
 
 문의/개인정보/이용 안내는 준비 상태와 미확정 항목을 표시한다. 연락처나 정책을 임의로 확정하지 않으며 noindex로 두었다. 배포 전 저자 검수와 운영 설정 확인이 필요하다.
 
