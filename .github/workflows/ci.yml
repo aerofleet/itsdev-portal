@@ -16,6 +16,7 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run test:directus-date
+      - run: node --test scripts/smoke-route.test.mjs
       - name: Sync published Directus articles
         env:
           DIRECTUS_CONTENTS_ENABLED: ${{ vars.DIRECTUS_CONTENTS_ENABLED }}
@@ -63,6 +64,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: npm run smoke:production
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: portal-${{ github.sha }}
           path: dist/
