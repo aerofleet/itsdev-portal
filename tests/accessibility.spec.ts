@@ -10,6 +10,10 @@ for(const theme of ['dark','light'])for(const route of routes){
   await page.evaluate(()=>document.fonts.ready);
   // Include the content exposed by native disclosure controls.
   await page.locator('details').evaluateAll(items=>items.forEach(item=>item.setAttribute('open','')));
+  // Audit settled text contrast, not a translucent entrance frame. Motion
+  // behavior and reduced-motion cancellation are checked in portal.spec.ts.
+  await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));
+  await expect(page.locator('[data-reveal-state="running"]')).toHaveCount(0);
   const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze();
   const reportPath=info.outputPath('axe-report.json');
   await writeFile(reportPath,JSON.stringify({url:page.url(),theme,viewport:page.viewportSize(),violations:result.violations,incomplete:result.incomplete},null,2));

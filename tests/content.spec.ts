@@ -1,4 +1,24 @@
 import { test, expect } from '@playwright/test';
+test('pending clipboard write preserves focus and rejects duplicate activation', async ({ page }) => {
+ await page.goto('/articles/qa-record-01/');
+ await page.evaluate(() => {
+  const state = window as typeof window & { finishCopy: () => void; copyCalls: number };
+  state.copyCalls = 0;
+  Object.defineProperty(navigator.clipboard, 'writeText', { value: () => {
+   state.copyCalls++;
+   return new Promise<void>(resolve => { state.finishCopy = resolve; });
+  } });
+ });
+ const copy = page.getByRole('button', { name: '코드 1 복사', exact: true });
+ await copy.focus(); await page.keyboard.press('Enter');
+ await expect(copy).toHaveAttribute('aria-disabled', 'true');
+ await expect(copy).toBeFocused();
+ await page.keyboard.press('Enter');
+ expect(await page.evaluate(() => (window as typeof window & { copyCalls: number }).copyCalls)).toBe(1);
+ await page.evaluate(() => (window as typeof window & { finishCopy: () => void }).finishCopy());
+ await expect(page.getByRole('status').first()).toHaveText('코드를 복사했습니다.');
+ await expect(copy).toBeFocused();
+});
 test('motion cards, copy feedback, hash navigation and off switch', async ({ page, context }) => {
  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
  await page.goto('/articles/');
@@ -11,8 +31,8 @@ test('motion cards, copy feedback, hash navigation and off switch', async ({ pag
  const copy=page.getByRole('button',{name:'코드 1 복사',exact:true});
  await copy.focus(); await page.keyboard.press('Enter');
  await expect(page.getByRole('status').first()).toHaveText('코드를 복사했습니다.');
- expect((await page.evaluate(()=>navigator.clipboard.readText())).replace(/\r\n/g,'\n')).toBe(await page.locator('.prose pre code').first().textContent());
  await expect(copy).toBeFocused();
+ expect((await page.evaluate(()=>navigator.clipboard.readText())).replace(/\r\n/g,'\n')).toBe(await page.locator('.prose pre code').first().textContent());
  await page.locator('.toc a').first().click();
  expect(new URL(page.url()).hash).not.toBe('');
  await page.emulateMedia({reducedMotion:'reduce'});

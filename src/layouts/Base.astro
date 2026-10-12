@@ -39,6 +39,12 @@ const motionMode=['off','subtle','standard'].includes(requestedMotion)?requested
 <footer class="hub-footer"><div><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">i</span>ITSDEV</a><p>직접 만든 서비스와 운영의 기록.<br/>만들고, 운영하고, 근거를 남깁니다.</p></div><nav aria-label="기록 탐색"><strong>둘러보기</strong><a href="/articles/">기록</a><a href="/services/">서비스</a><a href="/about/">소개와 기록 원칙</a><a href="/rss.xml">RSS</a></nav><nav aria-label="보조 메뉴"><strong>안내</strong><a href="/contact/">문의</a><a href="/privacy/">개인정보 안내</a><a href="/terms/">이용 안내</a></nav></footer>
 </div>
 <script>
+import { observeReveals } from '../lib/reveal.js';
+// Target content blocks rather than whole pages or long article bodies.
+document.querySelectorAll<HTMLElement>('.hub-intro > *, .hub-feature-art, .hub-feature-copy, .section-head, .category-links, .article-card, .hub-service, .hub-method > *, .page-head').forEach(element => {
+ element.dataset.motionReveal=element.matches('h1, .page-head')?'lead':'';
+});
+observeReveals();
 const root=document.documentElement;
 const theme=document.querySelector<HTMLButtonElement>('#theme');
 if(theme){

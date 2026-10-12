@@ -14,10 +14,13 @@ document.querySelectorAll<HTMLElement>('.prose pre').forEach((pre, index) => {
   status.setAttribute('role', 'status');
   status.setAttribute('aria-live', 'polite');
   let timer: ReturnType<typeof setTimeout>;
+  let copying = false;
   button.addEventListener('click', async () => {
+    if (copying) return;
+    copying = true;
     clearTimeout(timer);
     status.textContent = '';
-    button.disabled = true;
+    button.setAttribute('aria-disabled', 'true');
     try {
       await navigator.clipboard.writeText(code.textContent ?? '');
       button.dataset.copied = 'true';
@@ -26,7 +29,8 @@ document.querySelectorAll<HTMLElement>('.prose pre').forEach((pre, index) => {
     } catch {
       status.textContent = '복사하지 못했습니다. 코드를 직접 선택해 복사해주세요.';
     } finally {
-      button.disabled = false;
+      copying = false;
+      button.removeAttribute('aria-disabled');
       timer = setTimeout(() => {
         button.textContent = '코드 복사';
         delete button.dataset.copied;

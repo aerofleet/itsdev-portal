@@ -1,4 +1,18 @@
 import { test, expect } from '@playwright/test';
+test('entrance and scroll reveal once, with keyboard and reduced-motion escape',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await page.goto('/');
+ await expect(page.locator('#hub-title')).toHaveAttribute('data-reveal-state','done');
+ const section=page.locator('.hub-method > header');
+ await expect(section).not.toHaveAttribute('data-reveal-state',/running|done/);
+ await section.scrollIntoViewIfNeeded();
+ await expect(section).toHaveAttribute('data-reveal-state','done');
+ await page.evaluate(()=>scrollTo(0,0));await section.scrollIntoViewIfNeeded();
+ expect(await section.evaluate(el=>el.getAnimations().length)).toBe(0);
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await expect(page.locator('[data-reveal-state="running"]')).toHaveCount(0);
+ await expect(section).toHaveCSS('opacity','1');
+});
 test('home, category navigation, theme and motion',async({page},testInfo)=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('/');await expect(page.locator('h1')).toContainText('근거를 남깁니다.');
