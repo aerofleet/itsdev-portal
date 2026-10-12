@@ -1,4 +1,25 @@
 import { test, expect } from '@playwright/test';
+test('motion cards, copy feedback, hash navigation and off switch', async ({ page, context }) => {
+ await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+ await page.goto('/articles/');
+ const card=page.locator('.article-card').first();
+ await card.locator('a').first().focus();
+ await expect.poll(()=>card.evaluate(e=>getComputedStyle(e).transform)).not.toBe('none');
+ await page.evaluate(()=>document.documentElement.dataset.motion='off');
+ await expect(card).toHaveCSS('transform','none');
+ await page.goto('/articles/qa-record-01/');
+ const copy=page.getByRole('button',{name:'코드 1 복사',exact:true});
+ await copy.focus(); await page.keyboard.press('Enter');
+ await expect(page.getByRole('status').first()).toHaveText('코드를 복사했습니다.');
+ expect((await page.evaluate(()=>navigator.clipboard.readText())).replace(/\r\n/g,'\n')).toBe(await page.locator('.prose pre code').first().textContent());
+ await expect(copy).toBeFocused();
+ await page.locator('.toc a').first().click();
+ expect(new URL(page.url()).hash).not.toBe('');
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await expect(page.locator('html')).toHaveCSS('scroll-behavior','auto');
+ await expect(copy).toHaveCSS('transition-duration','0s');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
 test('static pagination and category navigation',async({page},info)=>{
  await page.goto('/articles/');await expect(page.locator('.article-card')).toHaveCount(12);
  await page.getByRole('link',{name:'다음 페이지',exact:true}).click();await expect(page).toHaveURL(/\/articles\/2\/$/);await expect(page.locator('.article-card')).toHaveCount(2);
