@@ -93,7 +93,7 @@ function recordToMarkdown(record) {
     evidenceStatus: record.evidenceStatus,
     verifiedAt: verifiedAt?.toISOString(),
     evidence: record.evidence ?? [],
-    revisions: record.revisions ?? [],
+    revisions: (record.revisions ?? []).filter((r) => r.rev && r.date && r.summary),
   };
   const lines = Object.entries(frontmatter)
     .filter(([, value]) => value !== undefined)
