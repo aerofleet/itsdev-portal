@@ -43,6 +43,8 @@ import { observeReveals } from '../lib/reveal.js';
 // Target content blocks rather than whole pages or long article bodies.
 document.querySelectorAll<HTMLElement>('.hub-intro > *, .hub-feature-art, .hub-feature-copy, .section-head, .category-links, .article-card, .hub-service, .hub-method > *, .page-head').forEach(element => {
  element.dataset.motionReveal=element.matches('h1, .page-head')?'lead':'';
+ if(element.matches('.hub-intro > *')) element.dataset.motionStep=element.matches('h1, .hub-eyebrow')?'0':element.matches('.hub-description')?'1':'2';
+ if(element.matches('.hub-feature-art, .hub-feature-copy')) element.dataset.motionStep='3';
 });
 observeReveals();
 const root=document.documentElement;
