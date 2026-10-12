@@ -11,8 +11,8 @@ test('motion cards, copy feedback, hash navigation and off switch', async ({ pag
  const copy=page.getByRole('button',{name:'코드 1 복사',exact:true});
  await copy.focus(); await page.keyboard.press('Enter');
  await expect(page.getByRole('status').first()).toHaveText('코드를 복사했습니다.');
- expect((await page.evaluate(()=>navigator.clipboard.readText())).replace(/\r\n/g,'\n')).toBe(await page.locator('.prose pre code').first().textContent());
  await expect(copy).toBeFocused();
+ expect((await page.evaluate(()=>navigator.clipboard.readText())).replace(/\r\n/g,'\n')).toBe(await page.locator('.prose pre code').first().textContent());
  await page.locator('.toc a').first().click();
  expect(new URL(page.url()).hash).not.toBe('');
  await page.emulateMedia({reducedMotion:'reduce'});
