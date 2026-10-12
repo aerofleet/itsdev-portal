@@ -47,6 +47,7 @@ jobs:
           retention-days: 14
       - run: npm run build
         env:
+          PUBLIC_MOTION_MODE: ${{ vars.PUBLIC_MOTION_MODE || 'subtle' }}
           ITSDEV_CONTENT_SOURCE: ${{ vars.DIRECTUS_CONTENTS_ENABLED == 'true' && 'directus' || '' }}
           DIRECTUS_API_URL: ${{ secrets.DIRECTUS_API_URL }}
           DIRECTUS_READ_TOKEN: ${{ secrets.DIRECTUS_READ_TOKEN }}

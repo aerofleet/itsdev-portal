@@ -2,6 +2,8 @@
 import '../assets/site.css';
 import '../assets/knowledge-hub.css';
 import '../assets/reading.css';
+import '../assets/motion.css';
+import '../assets/motion-portal.css';
 import SiteHeader from '../components/SiteHeader.astro';
 import LocalPreview from '../components/LocalPreview.astro';
 interface Props { title?: string; description?: string; canonical?: string; noindex?: boolean; article?: { published: string; modified?: string; category: string; }; }
@@ -11,9 +13,11 @@ const adsenseEnabled=!fixture&&process.env.ADSENSE_ENABLED==='true'&&process.env
 const url=canonical || new URL(Astro.url.pathname, Astro.site).href;
 const socialImage=new URL('/images/fieldnotes-og.png', Astro.site).href;
 const socialAlt='ITSDEV Engineering Fieldnotes — Build. Operate. Leave evidence.';
+const requestedMotion=import.meta.env.PUBLIC_MOTION_MODE;
+const motionMode=['off','subtle','standard'].includes(requestedMotion)?requestedMotion:'subtle';
 ---
 <!doctype html>
-<html lang="ko"><head>
+<html lang="ko" data-motion={motionMode}><head>
   <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <title>{title} | ITSDEV</title><meta name="description" content={description}/>
@@ -46,7 +50,8 @@ if(theme){
  theme.addEventListener('click',()=>{const t=isDark()?'light':'dark';root.dataset.theme=t;syncTheme();try{localStorage.setItem('itsdev-theme',t)}catch{}});
  try{if(sessionStorage.getItem('itsdev-intro'))root.classList.add('intro-seen');sessionStorage.setItem('itsdev-intro','1')}catch{}
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
- const apply=()=>{root.dataset.motion=reduced.matches?'off':'on'};
+ const configuredMotion=root.dataset.motion;
+ const apply=()=>{root.dataset.motion=reduced.matches?'off':configuredMotion};
  reduced.addEventListener('change',apply);apply();
 }
 </script>
