@@ -2,6 +2,9 @@ name: Portal validation
 on:
   push:
   pull_request:
+  repository_dispatch:
+    types: [cms-update]
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
@@ -60,14 +63,14 @@ jobs:
       - run: npm run test:e2e
       - run: npm run deploy:check
       - name: Deploy production Worker
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'repository_dispatch' || github.event_name == 'workflow_dispatch'
         env:
           DIRECTUS_CONTENTS_ENABLED: ${{ vars.DIRECTUS_CONTENTS_ENABLED }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npm run deploy
       - name: Smoke-test published article
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'repository_dispatch' || github.event_name == 'workflow_dispatch'
         run: npm run smoke:production
       - uses: actions/upload-artifact@v4
         if: always()
