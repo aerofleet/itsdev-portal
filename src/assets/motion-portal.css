@@ -4,10 +4,8 @@
 }
 .article-card.im-card { --im-distance-xs: 4px; border-radius: 18px; }
 .article-card.im-card .article-cover { transform: none; }
-.im-code-tools { display: flex; align-items: center; justify-content: flex-end; gap: 12px; min-height: 44px; margin-top: 18px; }
-.im-code-tools + pre { margin-top: 8px; }
-.im-copy { min-height: 44px; padding: 8px 14px; border: 1px solid var(--muted); border-radius: 8px; background: var(--surface); color: var(--ink); cursor: pointer; }
-.im-copy[data-copied=true] { color: var(--accent); }
-.im-copy-status { font-size: 13px; color: var(--muted); }
+.im-copy-inline { position: absolute; top: 8px; right: 8px; padding: 4px 10px; border: 0; border-radius: 6px; background: var(--tile); color: var(--muted); font-size: 12px; cursor: pointer; opacity: 0; transition: opacity .15s; line-height: 1.4; }
+.prose pre:hover .im-copy-inline, .im-copy-inline:focus-visible { opacity: 1; }
+.im-copy-inline[data-copied=true] { color: var(--accent); }
 .dark-light-toggle, .dark-light-toggle .icon30, .dark-light-toggle .icon30 svg { transition-duration: var(--im-duration-fast); }
-@media print { .im-code-tools { display: none; } }
+@media print { .im-copy-inline { display: none; } }
