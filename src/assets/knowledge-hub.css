@@ -38,6 +38,7 @@
 @media(max-width:900px){.article-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.article-list{grid-template-columns:1fr}}
 .art-log,.art-ai,.art-backend{background:var(--tile)}
+.article-thumb{width:100%;height:100%;object-fit:cover}
 .topic-cover:focus-visible,.article-cover:focus-visible{outline:3px solid var(--accent);outline-offset:-4px}
 @media(prefers-color-scheme:dark){:root:not([data-theme]){--paper:#08090b;--surface:#111316;--tile:#1b1e23;--ink:#f2f4f1;--muted:#aab0ba;--accent:#c0ee48;--on-accent:#182005;--red:#ff9d8e;--rule:#292d33;--control:#777f89;color-scheme:dark}}
 @media(prefers-reduced-motion:reduce){.topic-cover .topic-art{transition:none}}
