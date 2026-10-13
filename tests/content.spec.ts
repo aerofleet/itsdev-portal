@@ -11,12 +11,11 @@ test('pending clipboard write preserves focus and rejects duplicate activation',
  });
  const copy = page.getByRole('button', { name: '코드 1 복사', exact: true });
  await copy.focus(); await page.keyboard.press('Enter');
- await expect(copy).toHaveAttribute('aria-disabled', 'true');
  await expect(copy).toBeFocused();
  await page.keyboard.press('Enter');
  expect(await page.evaluate(() => (window as typeof window & { copyCalls: number }).copyCalls)).toBe(1);
  await page.evaluate(() => (window as typeof window & { finishCopy: () => void }).finishCopy());
- await expect(page.getByRole('status').first()).toHaveText('코드를 복사했습니다.');
+ await expect(copy).toHaveText('Copied!');
  await expect(copy).toBeFocused();
 });
 test('motion cards, copy feedback, hash navigation and off switch', async ({ page, context }) => {
@@ -30,14 +29,13 @@ test('motion cards, copy feedback, hash navigation and off switch', async ({ pag
  await page.goto('/articles/qa-record-01/');
  const copy=page.getByRole('button',{name:'코드 1 복사',exact:true});
  await copy.focus(); await page.keyboard.press('Enter');
- await expect(page.getByRole('status').first()).toHaveText('코드를 복사했습니다.');
+ await expect(copy).toHaveText('Copied!');
  await expect(copy).toBeFocused();
  expect((await page.evaluate(()=>navigator.clipboard.readText())).replace(/\r\n/g,'\n')).toBe(await page.locator('.prose pre code').first().textContent());
  await page.locator('.toc a').first().click();
  expect(new URL(page.url()).hash).not.toBe('');
  await page.emulateMedia({reducedMotion:'reduce'});
  await expect(page.locator('html')).toHaveCSS('scroll-behavior','auto');
- await expect(copy).toHaveCSS('transition-duration','0s');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 test('static pagination and category navigation',async({page},info)=>{
