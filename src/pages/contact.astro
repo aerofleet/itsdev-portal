@@ -39,6 +39,18 @@ const faqs = [
   <p>문의 유형을 선택하면 작성 폼이 열립니다.</p>
  </header>
 
+ <!-- 이메일 직접 연락 -->
+ <section class="email-bar">
+  <div class="email-info">
+   <span class="label">Direct Email</span>
+   <a href={`mailto:${email}`} class="email-address">{email}</a>
+  </div>
+  <button id="copy-btn" class="btn btn-copy" type="button" data-email={email}>
+   <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+   <span id="copy-text">주소 복사</span>
+  </button>
+ </section>
+
  <!-- 유형 선택 카드 -->
  <section class="inquiry-types">
   <h2 class="section-title">문의 유형 선택</h2>
@@ -187,6 +199,20 @@ form.addEventListener('submit', async (e) => {
  }
 });
 
+// 이메일 주소 복사
+const copyBtn = document.getElementById('copy-btn');
+const copyBtnText = document.getElementById('copy-text');
+copyBtn?.addEventListener('click', async () => {
+ const addr = copyBtn.getAttribute('data-email');
+ if (!addr) return;
+ try {
+  await navigator.clipboard.writeText(addr);
+  if (copyBtnText) copyBtnText.textContent = '복사 완료!';
+  copyBtn.classList.add('copied');
+  setTimeout(() => { if (copyBtnText) copyBtnText.textContent = '주소 복사'; copyBtn.classList.remove('copied'); }, 2000);
+ } catch {}
+});
+
 // 전체 내용 복사
 copyMsgBtn.addEventListener('click', async () => {
  const full = '제목: ' + subjectEl.value + '\n\n' + bodyEl.value;
@@ -206,6 +232,16 @@ copyMsgBtn.addEventListener('click', async () => {
 .status-dot{width:7px;height:7px;background:#10b981;border-radius:50%;box-shadow:0 0 0 2px rgba(16,185,129,.2);flex-shrink:0}
 .contact-header h1{font-size:clamp(2rem,4vw,2.5rem);font-weight:800;letter-spacing:-.04em;margin:0 0 .5rem}
 .contact-header p{color:var(--muted);font-size:1.05rem;line-height:1.6;margin:0}
+
+/* 이메일 바 */
+.email-bar{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:1rem 1.25rem;margin-bottom:2rem}
+.email-info{display:flex;align-items:center;gap:.75rem}
+.email-info .label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.email-address{font-size:.95rem;font-weight:600;color:var(--accent);text-decoration:none}
+.email-address:hover{text-decoration:underline}
+.btn-copy{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.btn-copy:hover{background:var(--tile)}
+.btn-copy.copied{border-color:var(--accent);color:var(--accent)}
 
 /* 유형 카드 */
 .section-title{font-size:1.1rem;font-weight:650;margin-bottom:1rem;color:var(--muted)}
@@ -277,6 +313,9 @@ copyMsgBtn.addEventListener('click', async () => {
  .compose{padding:1.25rem}
  .compose-actions{flex-direction:column}
  .contact-header h1{font-size:1.75rem}
+ .email-bar{flex-direction:column;gap:.75rem;align-items:stretch}
+ .email-info{justify-content:space-between}
+ .btn-copy{justify-content:center}
 }
 @media(prefers-reduced-motion:reduce){.inquiry-card,.compose{transition:none;animation:none}.inquiry-card:hover{transform:none}}
 :root[data-motion=off] .inquiry-card{transition:none;transform:none}
