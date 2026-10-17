@@ -16,6 +16,8 @@ for(const file of files.filter(f=>f.endsWith('.html'))){
  const text=fs.readFileSync(file,'utf8');
  // Astro omits non-200 endpoint responses; tolerate an empty response file only.
  if(!text.trim()){assert(file.endsWith('design-preview.html'),'Unexpected empty HTML');continue}
+ // Astro redirect pages are minimal HTML with meta refresh; skip full-page checks.
+ if(text.includes('http-equiv="refresh"')){continue}
  const nodes=[];const visit=n=>{nodes.push(n);for(const c of n.childNodes||[])visit(c)};visit(parse(text));
  const attrs=n=>Object.fromEntries((n.attrs||[]).map(a=>[a.name,a.value]));
  const ids=nodes.map(n=>attrs(n).id).filter(Boolean);
