@@ -1,4 +1,94 @@
 ---
 import Base from '../layouts/Base.astro';
+
+const lastUpdated = "2026년 10월 18일";
+const contactEmail = "itsdevkr@gmail.com";
 ---
-<Base title="개인정보 안내" noindex><header class="page-head"><h1>개인정보 안내</h1><p>출시 전 검토 중인 안내입니다.</p></header><div class="prose"><p>Google AdSense는 계정·사이트 승인, 적용 지역의 동의 설정, ads.txt 승인 상태와 광고 레이아웃 검수가 끝날 때까지 비활성화됩니다. 활성화 시 Google 광고 서비스의 데이터 처리와 쿠키 사용은 <a href="https://policies.google.com/technologies/ads?hl=ko" target="_blank" rel="noopener noreferrer">Google 광고 정책</a>을 확인해 주세요.</p><p>화면 테마는 브라우저의 localStorage에, 모션 선택은 sessionStorage에 저장합니다. 외부 서비스 링크를 열면 해당 서비스의 개인정보 처리 기준이 적용됩니다.</p><p>호스팅 과정의 접속 정보 처리, 보관 기간과 개인정보 관련 연락 수단은 운영 설정 확인 후 확정합니다.</p></div></Base>
+<Base title="개인정보처리방침" description="ITSDEV의 개인정보 수집, 이용 및 보호 정책에 대해 안내합니다.">
+<div class="policy-container">
+ <header class="policy-header">
+  <div class="version-badge">시행일자: {lastUpdated}</div>
+  <h1>개인정보처리방침</h1>
+  <p>ITSDEV(이하 '사이트')는 이용자의 개인정보를 중요하게 생각하며, 관련 법령을 준수하기 위해 최선을 다하고 있습니다.</p>
+ </header>
+ <div class="prose">
+  <section>
+   <h2>1. 개인정보의 수집 항목 및 수집 방법</h2>
+   <p>사이트는 별도의 회원가입이나 로그인 절차 없이 모든 기술 아티클과 콘텐츠를 자유롭게 열람할 수 있는 정적 웹사이트입니다.</p>
+   <ul>
+    <li><strong>문의 과정에서 수집되는 정보:</strong> 이용자가 문의 폼 또는 이메일(<code>{contactEmail}</code>)을 통해 기록 정정, 기술 질문, 협업 등을 제안할 때 발신자 이메일 주소, 이름(또는 닉네임), 메일 본문 내용이 수집될 수 있습니다.</li>
+    <li><strong>서비스 이용 과정에서 자동 생성되는 정보:</strong> 네트워크 보안 및 서비스 안정성(Cloudflare 인프라 등)을 위해 IP 주소, 접속 로그, 브라우저 종류, 방문 일시 등의 기술적 데이터가 자동으로 생성·기록될 수 있습니다.</li>
+   </ul>
+  </section>
+  <section>
+   <h2>2. 개인정보의 이용 목적</h2>
+   <p>수집된 정보는 다음의 목적에 한하여 최소한으로 활용됩니다.</p>
+   <ul>
+    <li>문의 폼 또는 이메일을 통한 문의·제안 사항의 확인, 사실 조사 및 처리 결과 회신</li>
+    <li>비정상적인 접근 트래픽 방어, DDoS 대응 등 서버 인프라 보안 및 안정성 유지</li>
+   </ul>
+  </section>
+  <section>
+   <h2>3. 개인정보의 보유 및 파기</h2>
+   <p>원칙적으로 개인정보의 수집 및 이용 목적이 달성되면 지체 없이 파기합니다.</p>
+   <ul>
+    <li><strong>문의 이메일:</strong> 문의 처리 및 후속 소통 완료 후 별도의 보관 사유가 없는 한 지체 없이 삭제합니다. 단, 기술 기록 정정 내역이나 지속적인 협업 관계 유지를 위해 필요한 경우 최대 1년간 보관될 수 있습니다.</li>
+    <li><strong>인프라 접속 로그:</strong> 보안 및 모니터링 시스템의 정책에 따라 일정 기간 보관 후 자동 파기됩니다.</li>
+   </ul>
+  </section>
+  <section>
+   <h2>4. 개인정보의 제3자 제공 및 위탁</h2>
+   <p>사이트는 이용자의 개인정보를 원칙적으로 외부에 제공하지 않습니다. 단, 글로벌 콘텐츠 전송 및 보안을 위해 아래와 같은 외부 클라우드 인프라 서비스를 이용하고 있습니다.</p>
+   <ul>
+    <li><strong>위탁 대상:</strong> Cloudflare, Inc.</li>
+    <li><strong>위탁 업무:</strong> 웹 트래픽 분산(CDN), DNS 관리, SSL 암호화 통신 및 웹 방화벽(WAF)을 통한 보안 유지</li>
+   </ul>
+   <p>또한, 문의 폼 전송 시 Web3Forms 서비스를 통해 이메일이 전달됩니다.</p>
+   <ul>
+    <li><strong>위탁 대상:</strong> Web3Forms</li>
+    <li><strong>위탁 업무:</strong> 문의 폼 데이터를 운영자 이메일로 전달</li>
+   </ul>
+  </section>
+  <section>
+   <h2>5. 쿠키(Cookie) 운용에 관한 사항</h2>
+   <p>사이트는 사용자 추적, 맞춤형 광고 집행 등을 목적으로 하는 상업용 쿠키를 직접 발행하거나 운용하지 않습니다. 단, 보안 및 인프라 CDN 서비스(Cloudflare)에서 악성 봇 차단 등을 위해 필수 기술 쿠키를 생성할 수 있습니다.</p>
+   <p>화면 테마 설정은 브라우저의 localStorage에, 모션 선택은 sessionStorage에 저장되며, 이는 외부로 전송되지 않습니다.</p>
+  </section>
+  <section>
+   <h2>6. 이용자의 권리와 행사 방법</h2>
+   <p>이용자는 언제든지 본인이 전송한 문의 내역 및 개인정보에 대해 열람, 정정, 삭제를 요청할 수 있습니다. 운영자 이메일(<code>{contactEmail}</code>)로 요청 주시면 지체 없이 처리해 드립니다.</p>
+  </section>
+  <section>
+   <h2>7. 개인정보 관리 책임 및 문의처</h2>
+   <p>개인정보 처리와 관련된 모든 문의, 불만 처리, 의견은 아래의 연락처로 보내주시기 바랍니다.</p>
+   <div class="contact-box">
+    <p><strong>운영자:</strong> ITSDEV</p>
+    <p><strong>이메일:</strong> <a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>
+   </div>
+  </section>
+  <section>
+   <h2>8. 개정 안내</h2>
+   <p>본 방침은 관계 법령이나 서비스 운영 정책의 변경에 따라 수정될 수 있으며, 개정 시 본 페이지를 통해 변경 일자와 내용을 공지합니다.</p>
+  </section>
+ </div>
+</div>
+</Base>
+
+<style>
+.policy-container{max-width:680px;margin:0 auto;padding:3rem var(--gutter)}
+.policy-header{margin-bottom:2.5rem;border-bottom:1px solid var(--rule);padding-bottom:1.5rem}
+.version-badge{font-size:.8125rem;color:var(--muted);background:var(--surface);display:inline-block;padding:.2rem .6rem;border-radius:6px;margin-bottom:1rem;font-weight:600;border:1px solid var(--rule)}
+.policy-header h1{font-size:clamp(2rem,4vw,2.25rem);font-weight:800;letter-spacing:-.04em;margin:0 0 .75rem}
+.policy-header p{color:var(--muted);font-size:1.05rem;line-height:1.6;margin:0}
+.policy-container .prose section{margin-bottom:2.25rem}
+.policy-container .prose h2{font-size:1.15rem;font-weight:700;margin:0 0 .75rem;letter-spacing:-.01em}
+.policy-container .prose p{line-height:1.75;color:var(--ink);margin:0 0 .75rem;font-size:.925rem}
+.policy-container .prose ul{margin:0 0 1rem 1.25rem;padding:0;font-size:.925rem;line-height:1.75}
+.policy-container .prose li{margin-bottom:.4rem;color:var(--ink)}
+.policy-container .prose li strong{color:var(--ink)}
+.policy-container .prose code{background:var(--tile);padding:.15rem .35rem;border-radius:4px;font-size:.85rem}
+.contact-box{background:var(--tile);border:1px solid var(--rule);border-radius:10px;padding:1rem 1.25rem;margin-top:.75rem}
+.contact-box p{margin:.25rem 0;font-size:.9rem}
+.contact-box a{color:var(--accent);text-decoration:underline}
+@media(max-width:640px){.policy-container{padding:2rem var(--gutter)}.policy-header h1{font-size:1.75rem}}
+</style>
