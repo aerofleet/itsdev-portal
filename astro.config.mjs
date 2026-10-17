@@ -4,6 +4,9 @@ import { unified } from '@astrojs/markdown-remark';
 export default defineConfig({
   site: 'https://itsdev.kr',
   output: 'static',
+  redirects: {
+    '/articles/directus-cms-first-post/': '/articles/',
+  },
   outDir: process.env.ITSDEV_CONTENT_FIXTURES==='1'?'./.codex/content-dist':'./dist',
   cacheDir: process.env.ITSDEV_CONTENT_FIXTURES==='1'?'./.codex/content-cache':'./node_modules/.astro',
   trailingSlash: 'always',
