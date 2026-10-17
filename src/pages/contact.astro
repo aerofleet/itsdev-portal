@@ -2,80 +2,200 @@
 import Base from '../layouts/Base.astro';
 
 const email = "itsdevkr@gmail.com";
+const w3fKey = import.meta.env.PUBLIC_WEB3FORMS_KEY || '';
 
 const contactReasons = [
   {
-    title: "기록 정정", tag: "Feedback",
+    id: "feedback", title: "기록 정정", tag: "Feedback",
     desc: "기술 아티클의 오탈자, 잘못된 정보, 누락된 레퍼런스를 제보해주세요.",
     subject: "[ITSDEV] 기술 기록 정정 요청",
     body: "1. 아티클 제목 또는 링크:\n\n2. 수정/정정이 필요한 내용:\n\n3. 관련 참고 자료(선택):",
   },
   {
-    title: "기술 질문", tag: "Q&A",
+    id: "question", title: "기술 질문", tag: "Q&A",
     desc: "다룬 주제나 아키텍처에 대한 추가 논의 및 질문을 환영합니다.",
     subject: "[ITSDEV] 기술 아티클 질문",
     body: "1. 관련 아티클 제목 또는 주제:\n\n2. 질문 또는 논의하고 싶은 내용:",
   },
   {
-    title: "협업 제안", tag: "Collab",
+    id: "collab", title: "협업 제안", tag: "Collab",
     desc: "프로젝트 협업, 기술 교류, 기고 등 다양한 제안을 기다립니다.",
     subject: "[ITSDEV] 협업 및 교류 제안",
     body: "1. 소속 / 닉네임:\n\n2. 제안 배경 및 내용:\n\n3. 연락처 또는 회신 링크:",
   },
 ];
 
-function mailto(subject: string, body: string) {
-  const p = new URLSearchParams({ subject, body });
-  return `mailto:${email}?${p.toString().replace(/\+/g, '%20')}`;
-}
+const faqs = [
+  { q: "기록에 사용된 코드를 프로젝트에서 사용해도 되나요?", a: "기록에 포함된 코드 조각은 참고용입니다. 프로젝트에 적용하실 때는 라이선스와 환경 차이를 반드시 확인해주세요." },
+  { q: "특정 주제의 기록을 요청할 수 있나요?", a: "네, 위 폼에서 '기술 질문' 유형으로 요청해주시면 검토 후 기록 작성을 계획합니다." },
+  { q: "회신은 어떻게 받나요?", a: "폼에 입력한 이메일 주소로 직접 회신드립니다. 보통 1–2 영업일 내 답변합니다." },
+];
 ---
 <Base title="문의" description="ITSDEV에 대한 문의, 기록 정정 요청, 협업 제안은 이메일로 보내주세요.">
 <div class="contact-container">
  <header class="contact-header">
   <div class="status-badge"><span class="status-dot"></span><span>보통 1–2 영업일 내 회신</span></div>
   <h1>Contact &amp; Feedback</h1>
-  <p>문의 목적에 맞는 카드를 선택하면 템플릿이 자동으로 채워집니다.</p>
+  <p>문의 유형을 선택하면 작성 폼이 열립니다.</p>
  </header>
- <section class="email-bar">
-  <div class="email-info">
-   <span class="label">Direct Contact</span>
-   <span class="email-address">{email}</span>
-  </div>
-  <button id="copy-btn" class="btn btn-copy" data-email={email}>
-   <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-   <span id="copy-text">이메일 복사</span>
-  </button>
- </section>
+
+ <!-- 유형 선택 카드 -->
  <section class="inquiry-types">
   <h2 class="section-title">문의 유형 선택</h2>
   <div class="inquiry-grid">
    {contactReasons.map((item) => (
-    <a href={mailto(item.subject, item.body)} class="inquiry-card" title={`${item.title} 템플릿으로 메일 작성`}>
-     <span class="card-top">
-      <span class="inquiry-tag">{item.tag}</span>
-      <span class="action-hint">템플릿 열기 <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span>
-     </span>
+    <button class="inquiry-card" type="button" data-type={item.id} data-subject={item.subject} data-body={item.body}>
+     <span class="card-top"><span class="inquiry-tag">{item.tag}</span></span>
      <h3>{item.title}</h3>
      <p>{item.desc}</p>
-    </a>
+    </button>
    ))}
   </div>
+ </section>
+
+ <!-- 작성 폼 -->
+ <section id="compose" class="compose" hidden>
+  <div class="compose-header">
+   <h2 id="compose-title">메일 작성</h2>
+   <button id="compose-close" class="compose-close" type="button" aria-label="작성 취소">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+   </button>
+  </div>
+  <form id="contact-form" class="compose-form">
+   <input type="hidden" name="access_key" value={w3fKey}/>
+   <input type="hidden" name="from_name" value="ITSDEV Contact"/>
+   <input type="hidden" id="h-subject" name="subject" value=""/>
+   <input type="hidden" name="botcheck" style="display:none"/>
+   <div class="field">
+    <label class="field-label" for="c-subject">제목</label>
+    <input id="c-subject" class="field-input" type="text" readonly tabindex="-1"/>
+   </div>
+   <div class="field-row">
+    <div class="field">
+     <label class="field-label" for="c-name">이름 또는 닉네임 <span class="optional">선택</span></label>
+     <input id="c-name" name="name" class="field-input" type="text"/>
+    </div>
+    <div class="field">
+     <label class="field-label" for="c-from">회신 이메일 <span class="required">필수</span></label>
+     <input id="c-from" name="email" class="field-input" type="email" required/>
+    </div>
+   </div>
+   <div class="field">
+    <label class="field-label" for="c-body">내용</label>
+    <textarea id="c-body" name="message" class="field-textarea" rows="10" required></textarea>
+   </div>
+   <div class="compose-actions">
+    <button id="btn-submit" class="btn btn-primary" type="submit">
+     <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+     <span id="btn-submit-text">문의 보내기</span>
+    </button>
+    <button id="btn-copy-msg" class="btn btn-secondary" type="button">
+     <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+     <span id="btn-copy-msg-text">전체 내용 복사</span>
+    </button>
+   </div>
+  </form>
+  <!-- 전송 결과 -->
+  <div id="result-success" class="result-msg success" hidden>
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+   <div><strong>문의가 전송되었습니다.</strong><p>입력하신 이메일로 회신드리겠습니다.</p></div>
+  </div>
+  <div id="result-error" class="result-msg error" hidden>
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+   <div><strong>전송에 실패했습니다.</strong><p>'전체 내용 복사' 후 <strong>{email}</strong>으로 직접 보내주세요.</p></div>
+  </div>
+ </section>
+
+ <!-- FAQ -->
+ <section class="faq">
+  <h2 class="section-title">자주 묻는 질문</h2>
+  {faqs.map((item) => (
+   <details class="faq-item">
+    <summary>{item.q}</summary>
+    <p>{item.a}</p>
+   </details>
+  ))}
  </section>
 </div>
 </Base>
 
 <script>
-const copyBtn = document.getElementById('copy-btn');
-const copyText = document.getElementById('copy-text');
-copyBtn?.addEventListener('click', async () => {
- const email = copyBtn.getAttribute('data-email');
- if (!email) return;
+const cards = document.querySelectorAll<HTMLButtonElement>('.inquiry-card');
+const compose = document.getElementById('compose')!;
+const composeTitle = document.getElementById('compose-title')!;
+const subjectEl = document.getElementById('c-subject') as HTMLInputElement;
+const hSubject = document.getElementById('h-subject') as HTMLInputElement;
+const nameEl = document.getElementById('c-name') as HTMLInputElement;
+const fromEl = document.getElementById('c-from') as HTMLInputElement;
+const bodyEl = document.getElementById('c-body') as HTMLTextAreaElement;
+const closeBtn = document.getElementById('compose-close')!;
+const form = document.getElementById('contact-form') as HTMLFormElement;
+const submitBtn = document.getElementById('btn-submit') as HTMLButtonElement;
+const submitText = document.getElementById('btn-submit-text')!;
+const copyMsgBtn = document.getElementById('btn-copy-msg')!;
+const copyMsgText = document.getElementById('btn-copy-msg-text')!;
+const resultSuccess = document.getElementById('result-success')!;
+const resultError = document.getElementById('result-error')!;
+
+// 카드 선택 → 폼 열기
+cards.forEach(card => {
+ card.addEventListener('click', () => {
+  cards.forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  const title = card.querySelector('h3')!.textContent!;
+  subjectEl.value = card.dataset.subject!;
+  hSubject.value = card.dataset.subject!;
+  bodyEl.value = card.dataset.body!;
+  composeTitle.textContent = title + ' — 메일 작성';
+  form.hidden = false;
+  resultSuccess.hidden = true;
+  resultError.hidden = true;
+  submitBtn.disabled = false;
+  submitText.textContent = '문의 보내기';
+  compose.hidden = false;
+  compose.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  fromEl.focus();
+ });
+});
+
+// 닫기
+closeBtn.addEventListener('click', () => {
+ compose.hidden = true;
+ cards.forEach(c => c.classList.remove('selected'));
+});
+
+// 폼 전송 (Web3Forms)
+form.addEventListener('submit', async (e) => {
+ e.preventDefault();
+ submitBtn.disabled = true;
+ submitText.textContent = '전송 중…';
  try {
-  await navigator.clipboard.writeText(email);
-  if (copyText) copyText.textContent = '복사 완료!';
-  copyBtn.classList.add('copied');
-  setTimeout(() => { if (copyText) copyText.textContent = '이메일 복사'; copyBtn.classList.remove('copied'); }, 2000);
- } catch { window.location.href = `mailto:${email}`; }
+  const res = await fetch('https://api.web3forms.com/submit', {
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json' },
+   body: JSON.stringify(Object.fromEntries(new FormData(form))),
+  });
+  if (res.ok) {
+   form.hidden = true;
+   resultSuccess.hidden = false;
+   resultError.hidden = true;
+  } else { throw new Error(); }
+ } catch {
+  resultError.hidden = false;
+  submitBtn.disabled = false;
+  submitText.textContent = '문의 보내기';
+ }
+});
+
+// 전체 내용 복사
+copyMsgBtn.addEventListener('click', async () => {
+ const full = '제목: ' + subjectEl.value + '\n\n' + bodyEl.value;
+ try {
+  await navigator.clipboard.writeText(full);
+  copyMsgText.textContent = '복사 완료!';
+  copyMsgBtn.classList.add('copied');
+  setTimeout(() => { copyMsgText.textContent = '전체 내용 복사'; copyMsgBtn.classList.remove('copied'); }, 2000);
+ } catch {}
 });
 </script>
 
@@ -86,27 +206,79 @@ copyBtn?.addEventListener('click', async () => {
 .status-dot{width:7px;height:7px;background:#10b981;border-radius:50%;box-shadow:0 0 0 2px rgba(16,185,129,.2);flex-shrink:0}
 .contact-header h1{font-size:clamp(2rem,4vw,2.5rem);font-weight:800;letter-spacing:-.04em;margin:0 0 .5rem}
 .contact-header p{color:var(--muted);font-size:1.05rem;line-height:1.6;margin:0}
-.email-bar{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:1rem 1.25rem;margin-bottom:2.5rem}
-.email-info{display:flex;align-items:center;gap:.75rem}
-.email-info .label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-.email-address{font-size:.95rem;font-weight:600;color:var(--accent)}
-.btn-copy{display:inline-flex;align-items:center;gap:.375rem;background:transparent;border:1px solid var(--rule);padding:.45rem .85rem;border-radius:8px;font-size:.825rem;font-weight:600;cursor:pointer;color:var(--ink);transition:background .15s,border-color .15s;min-height:44px}
-.btn-copy:hover{background:var(--tile)}
-.btn-copy.copied{border-color:var(--accent);color:var(--accent)}
-.copy-icon{width:14px;height:14px;flex-shrink:0}
+
+/* 유형 카드 */
 .section-title{font-size:1.1rem;font-weight:650;margin-bottom:1rem;color:var(--muted)}
 .inquiry-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
-.inquiry-card{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:1.25rem;display:flex;flex-direction:column;gap:.5rem;text-decoration:none;color:var(--ink);transition:transform .2s,border-color .2s,box-shadow .2s;cursor:pointer}
+.inquiry-card{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:1.25rem;display:flex;flex-direction:column;gap:.5rem;text-align:left;color:var(--ink);cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s}
 .inquiry-card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 8px 20px rgba(0,0,0,.08)}
-.card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.25rem}
+.inquiry-card.selected{border-color:var(--accent);background:var(--tile);box-shadow:0 0 0 2px var(--accent)}
+.card-top{display:flex;align-items:center;margin-bottom:.25rem}
 .inquiry-tag{font-size:.7rem;font-weight:700;letter-spacing:.06em;background:var(--tile);border:1px solid var(--rule);padding:.15rem .5rem;border-radius:6px;color:var(--muted)}
-.action-hint{display:inline-flex;align-items:center;gap:.2rem;font-size:.75rem;font-weight:500;color:var(--muted);transition:color .15s}
-.arrow{width:14px;height:14px;transition:transform .2s}
-.inquiry-card:hover .action-hint{color:var(--accent)}
-.inquiry-card:hover .arrow{transform:translate(2px,-2px)}
+.inquiry-card.selected .inquiry-tag{background:var(--surface)}
 .inquiry-card h3{margin:0;font-size:1.05rem;font-weight:650}
 .inquiry-card p{margin:0;font-size:.825rem;line-height:1.55;color:var(--muted)}
-@media(max-width:640px){.contact-container{padding:2rem var(--gutter)}.inquiry-grid{grid-template-columns:1fr}.email-bar{flex-direction:column;gap:.75rem;align-items:stretch}.email-info{justify-content:space-between}.btn-copy{justify-content:center}.contact-header h1{font-size:1.75rem}}
-@media(prefers-reduced-motion:reduce){.inquiry-card{transition:none}.inquiry-card:hover{transform:none}}
+
+/* 작성 폼 */
+.compose{margin-top:2.5rem;background:var(--surface);border:1px solid var(--rule);border-radius:16px;padding:1.75rem;animation:composeIn .3s ease}
+@keyframes composeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.compose-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+.compose-header h2{margin:0;font-size:1.2rem;font-weight:700}
+.compose-close{background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;border-radius:6px;transition:color .15s}
+.compose-close:hover{color:var(--ink)}
+.compose-close svg{width:20px;height:20px}
+
+/* 필드 */
+.field{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1rem}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.field-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:flex;align-items:center;gap:.5rem}
+.required{font-size:.65rem;color:var(--accent);font-weight:600;text-transform:none;letter-spacing:0}
+.optional{font-size:.65rem;color:var(--control);font-weight:500;text-transform:none;letter-spacing:0}
+.field-input,.field-textarea{background:var(--paper);border:1px solid var(--rule);border-radius:10px;padding:.75rem 1rem;font-size:.9rem;color:var(--ink);font-family:inherit;transition:border-color .15s}
+.field-input:focus,.field-textarea:focus{outline:none;border-color:var(--accent)}
+.field-input[readonly]{background:var(--tile);color:var(--muted);cursor:default}
+.field-textarea{resize:vertical;min-height:160px;line-height:1.65}
+
+/* 액션 버튼 */
+.compose-actions{display:flex;gap:.75rem;margin-top:1.5rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.75rem 1.25rem;border-radius:10px;font-size:.875rem;font-weight:600;cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s,opacity .15s;min-height:44px;border:none}
+.btn-icon{width:16px;height:16px;flex-shrink:0}
+.btn-primary{background:var(--accent);color:var(--on-accent)}
+.btn-primary:hover{opacity:.88}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-secondary{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.btn-secondary:hover{background:var(--tile)}
+.btn-secondary.copied{border-color:var(--accent);color:var(--accent)}
+
+/* 전송 결과 */
+.result-msg{display:flex;align-items:flex-start;gap:1rem;padding:1.25rem;border-radius:12px;margin-top:1.25rem}
+.result-msg svg{width:24px;height:24px;flex-shrink:0;margin-top:2px}
+.result-msg strong{display:block;margin-bottom:.25rem;font-size:.95rem}
+.result-msg p{margin:0;font-size:.85rem;color:var(--muted);line-height:1.5}
+.result-msg.success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3)}
+.result-msg.success svg{color:#10b981}
+.result-msg.error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3)}
+.result-msg.error svg{color:#ef4444}
+.result-msg.error strong{color:var(--red)}
+
+/* FAQ */
+.faq{margin-top:3rem}
+.faq-item{background:var(--surface);border:1px solid var(--rule);border-radius:12px;margin-top:.75rem;padding:0 1.25rem}
+.faq-item summary{min-height:56px;cursor:pointer;padding:1rem 0;font-size:.925rem;font-weight:600;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{content:'+';font-size:1.25rem;color:var(--accent);font-weight:700;flex-shrink:0}
+.faq-item[open] summary::after{content:'\2212'}
+.faq-item p{padding:0 0 1rem;color:var(--muted);font-size:.875rem;line-height:1.7;margin:0}
+
+@media(max-width:640px){
+ .contact-container{padding:2rem var(--gutter)}
+ .inquiry-grid{grid-template-columns:1fr}
+ .field-row{grid-template-columns:1fr}
+ .compose{padding:1.25rem}
+ .compose-actions{flex-direction:column}
+ .contact-header h1{font-size:1.75rem}
+}
+@media(prefers-reduced-motion:reduce){.inquiry-card,.compose{transition:none;animation:none}.inquiry-card:hover{transform:none}}
 :root[data-motion=off] .inquiry-card{transition:none;transform:none}
+:root[data-motion=off] .compose{animation:none}
 </style>

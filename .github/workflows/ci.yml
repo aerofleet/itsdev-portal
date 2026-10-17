@@ -48,6 +48,7 @@ jobs:
           ADSENSE_CONSENT_READY: ${{ vars.ADSENSE_CONSENT_READY }}
           ADSENSE_ADS_TXT_READY: ${{ vars.ADSENSE_ADS_TXT_READY }}
           ADSENSE_PERFORMANCE_READY: ${{ vars.ADSENSE_PERFORMANCE_READY }}
+          PUBLIC_WEB3FORMS_KEY: ${{ secrets.WEB3FORMS_KEY }}
       - run: npm run deploy:check
       - name: Deploy production Worker
         env:
@@ -118,6 +119,7 @@ jobs:
           ADSENSE_CONSENT_READY: ${{ vars.ADSENSE_CONSENT_READY }}
           ADSENSE_ADS_TXT_READY: ${{ vars.ADSENSE_ADS_TXT_READY }}
           ADSENSE_PERFORMANCE_READY: ${{ vars.ADSENSE_PERFORMANCE_READY }}
+          PUBLIC_WEB3FORMS_KEY: ${{ secrets.WEB3FORMS_KEY }}
       - run: npm run verify
       - run: npm run test:e2e
       - run: npm run deploy:check
