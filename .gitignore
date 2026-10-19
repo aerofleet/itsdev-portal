@@ -16,3 +16,4 @@ dist/
 # Keep local screenshots, build reports and one-off scripts out of Git.
 .codex/*
 !.codex/source-manifest.json
+public/images/cms/

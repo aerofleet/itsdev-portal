@@ -10,6 +10,7 @@ const accessId = process.env.CF_ACCESS_CLIENT_ID;
 const accessSecret = process.env.CF_ACCESS_CLIENT_SECRET;
 const collection = process.env.DIRECTUS_ARTICLES_COLLECTION || 'fieldnotes';
 const output = path.resolve('.codex/directus-content/articles');
+const assetOutput = path.resolve('public/images/cms');
 
 if (!api || (!token && !publicRead)) {
   console.error('CMS sync requires DIRECTUS_API_URL and either DIRECTUS_READ_TOKEN or DIRECTUS_PUBLIC_READ=true.');
@@ -47,6 +48,47 @@ if (!publicRead) headers.Authorization = `Bearer ${token}`;
 if (accessId) {
   headers['CF-Access-Client-Id'] = accessId;
   headers['CF-Access-Client-Secret'] = accessSecret;
+}
+
+const CONTENT_TYPE_EXT = { 'image/png': '.png', 'image/jpeg': '.jpg', 'image/gif': '.gif', 'image/webp': '.webp', 'image/svg+xml': '.svg', 'image/avif': '.avif' };
+const CMS_ASSET_RE = new RegExp(`${apiOrigin.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/assets/([0-9a-f-]{36})`, 'g');
+
+async function downloadAssets(bodies) {
+  const ids = new Set();
+  for (const body of bodies) {
+    for (const m of body.matchAll(CMS_ASSET_RE)) ids.add(m[1]);
+  }
+  if (ids.size === 0) return new Map();
+  await fs.mkdir(assetOutput, { recursive: true });
+  const mapping = new Map();
+  const downloadHeaders = { ...headers };
+  delete downloadHeaders.Accept;
+  let ok = 0;
+  let fail = 0;
+  for (const id of ids) {
+    const url = `${apiOrigin}/assets/${id}`;
+    try {
+      const res = await fetch(url, { headers: downloadHeaders, redirect: 'follow', signal: AbortSignal.timeout(30_000) });
+      if (!res.ok) { fail++; console.warn(`Asset ${id}: HTTP ${res.status}, skipped.`); continue; }
+      const ct = (res.headers.get('content-type') || '').split(';')[0].trim();
+      const ext = CONTENT_TYPE_EXT[ct] || '.bin';
+      const filename = `${id}${ext}`;
+      const buf = Buffer.from(await res.arrayBuffer());
+      await fs.writeFile(path.join(assetOutput, filename), buf);
+      mapping.set(id, `/images/cms/${filename}`);
+      ok++;
+    } catch (err) {
+      fail++;
+      console.warn(`Asset ${id}: ${err.message}, skipped.`);
+    }
+  }
+  console.log(`Asset download: ${ok} succeeded, ${fail} failed out of ${ids.size} unique asset(s).`);
+  return mapping;
+}
+
+function rewriteAssetUrls(body, mapping) {
+  if (mapping.size === 0) return body;
+  return body.replace(CMS_ASSET_RE, (match, id) => mapping.has(id) ? mapping.get(id) : match);
 }
 
 function scalar(value) {
@@ -140,10 +182,14 @@ const rendered = collected.flatMap((record) => {
   return [[record.slug, recordToMarkdown({ ...record, pubDate: pubDate.toISOString() })]];
 });
 
+const assetMapping = await downloadAssets(rendered.map(([, md]) => md));
+
 await fs.mkdir(path.dirname(output), { recursive: true });
 await fs.rm(output, { recursive: true, force: true });
 await fs.mkdir(output, { recursive: true });
-for (const [slug, markdown] of rendered) await fs.writeFile(path.join(output, `${slug}.md`), markdown, { flag: 'wx' });
+for (const [slug, markdown] of rendered) {
+  await fs.writeFile(path.join(output, `${slug}.md`), rewriteAssetUrls(markdown, assetMapping), { flag: 'wx' });
+}
 if (omittedOptionalMetadata.size > 0) {
   console.warn(`Omitted unsupported optional Directus metadata field(s): ${[...omittedOptionalMetadata].sort().join(', ')}.`);
 }
