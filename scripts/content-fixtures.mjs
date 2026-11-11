@@ -48,7 +48,7 @@ function generate(){
  fs.mkdirSync(fixtureRoot,{recursive:true});
  for(let i=1;i<=14;i++){
   const id=`qa-record-${String(i).padStart(2,'0')}`;
-  write(id,{title:i===1?'[검증용] 정적 콘텐츠 포털에서 배포와 복구의 경계를 나누고 긴 제목과 코드, 표의 읽기 흐름을 확인하는 기록':`[검증용] 콘텐츠 경로 확인 기록 ${i}`,description:'목록·분류·상세·개정 이력을 확인하기 위한 로컬 테스트 콘텐츠입니다.',documentId:`QA-${String(i).padStart(3,'0')}`,pubDate:`2020-01-${String(i).padStart(2,'0')}`,category:i<=13?'infra':'backend',tags:['로컬 검증','콘텐츠 경계'],draft:false,sample:false,featured:i===1,articleType:'design',environment:['Astro static','로컬 Chromium · 격리된 검증 빌드'],evidenceStatus:'planned',...(i===1?{updatedDate:'2020-02-01',revisions:[{rev:'REV A',date:'2020-01-01',summary:'초안 표현 확인'},{rev:'REV B',date:'2020-02-01',summary:'긴 제목과 코드·표 배치 확인'}]}:{revisions:[]})},sampleBody);
+  write(id,{title:i===1?'[검증용] 정적 콘텐츠 포털에서 배포와 복구의 경계를 나누고 긴 제목과 코드, 표의 읽기 흐름을 확인하는 기록':`[검증용] 콘텐츠 경로 확인 기록 ${i}`,description:'목록·분류·상세·개정 이력을 확인하기 위한 로컬 테스트 콘텐츠입니다.',documentId:`QA-${String(i).padStart(3,'0')}`,pubDate:`2020-01-${String(i).padStart(2,'0')}`,category:i<=13?'infra':'backend',tags:['로컬 검증','콘텐츠 경계'],draft:false,sample:false,featured:i===1,articleType:'design',environment:['Astro static','로컬 Chromium · 격리된 검증 빌드'],evidenceStatus:'planned',...(i===1?{updatedDate:'2020-02-01',revisions:[{rev:'REV A',date:'2020-01-01',summary:'초안 표현 확인'},{rev:'REV B',date:'2020-02-01',summary:'긴 제목과 코드·표 배치 확인'}]}:{revisions:[]})},i===14?`![검증 이미지](/images/services/djc.png)\n\n${sampleBody}`:sampleBody);
  }
  const base={title:'비공개 검사 표식',description:'공개 산출물에 노출되면 실패',pubDate:'2020-01-01',category:'infra',tags:[],draft:false,evidenceStatus:'planned'};
  write('qa-hidden-draft',{...base,documentId:'QA-HIDDEN-DRAFT',draft:true},'QA_HIDDEN_DRAFT_TOKEN');
@@ -60,6 +60,11 @@ const read=route=>fs.readFileSync(path.join(output,route),'utf8');
 const nodes=html=>{const result=[];const visit=n=>{result.push(n);for(const c of n.childNodes||[])visit(c)};visit(parse(html));return result};
 const attrs=n=>Object.fromEntries((n.attrs||[]).map(a=>[a.name,a.value]));
 function verify(){
+ const home=nodes(read('index.html'));
+ const feature=home.find(n=>(attrs(n).class||'').split(' ').includes('hub-feature'));
+ const featureNodes=[]; const visit=n=>{featureNodes.push(n);for(const child of n.childNodes||[])visit(child)};visit(feature);
+ assert(featureNodes.some(n=>n.tagName==='img'&&attrs(n).src==='/images/services/djc.png'),'Latest article image missing');
+ assert(featureNodes.some(n=>n.tagName==='a'&&attrs(n).href==='/articles/qa-record-14/'),'Latest article link missing');
  for(const [route,count] of [['articles/index.html',12],['articles/2/index.html',2],['articles/category/infra/index.html',12],['articles/category/infra/2/index.html',1],['articles/category/backend/index.html',1]]){
   assert.equal(nodes(read(route)).filter(n=>(attrs(n).class||'').split(' ').includes('article-card')).length,count,route);
  }
